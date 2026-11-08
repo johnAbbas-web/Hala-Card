@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#061506" />
+  <title>Hala — Welcome</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="manifest" href="manifest.json" />
+
+  <style>
+    .welcome-page {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0 32px;
+      gap: 0;
+    }
+
+    .logo-zone {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeUp 0.8s ease forwards;
+      opacity: 0;
+    }
+
+    .tagline {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 18px;
+      font-weight: 300;
+      color: rgba(180,145,60,0.65);
+      letter-spacing: 0.04em;
+      text-align: center;
+      margin-top: 28px;
+      animation: fadeUp 0.8s 0.2s ease forwards;
+      opacity: 0;
+    }
+
+    .btn-zone {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 52px;
+      animation: fadeUp 0.8s 0.4s ease forwards;
+      opacity: 0;
+    }
+
+    .guest-link {
+      text-align: center;
+      margin-top: 8px;
+      font-size: 12px;
+      color: rgba(180,145,60,0.32);
+      cursor: pointer;
+      letter-spacing: 0.08em;
+      transition: color 0.2s;
+    }
+    .guest-link:hover { color: var(--gold-dim); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Decorative corner ornaments */
+    .corner-ornament {
+      position: fixed;
+      width: 80px;
+      height: 80px;
+      opacity: 0.08;
+      pointer-events: none;
+    }
+    .corner-tl { top: 20px; left: 20px; border-top: 1px solid var(--gold); border-left: 1px solid var(--gold); border-radius: 4px 0 0 0; }
+    .corner-tr { top: 20px; right: 20px; border-top: 1px solid var(--gold); border-right: 1px solid var(--gold); border-radius: 0 4px 0 0; }
+    .corner-bl { bottom: 90px; left: 20px; border-bottom: 1px solid var(--gold); border-left: 1px solid var(--gold); border-radius: 0 0 0 4px; }
+    .corner-br { bottom: 90px; right: 20px; border-bottom: 1px solid var(--gold); border-right: 1px solid var(--gold); border-radius: 0 0 4px 0; }
+  </style>
+</head>
+<body>
+  <div class="hala-bg">
+    <div class="arabesque"></div>
+
+    <div class="corner-ornament corner-tl"></div>
+    <div class="corner-ornament corner-tr"></div>
+    <div class="corner-ornament corner-bl"></div>
+    <div class="corner-ornament corner-br"></div>
+
+    <div class="welcome-page">
+
+      <div class="logo-zone">
+        <img src="assets/logo.png" alt="Hala" style="width:88px; height:88px; object-fit:contain; filter:drop-shadow(0 0 20px rgba(180,145,60,0.35));" />
+        <div style="font-family:'Cormorant Garamond',serif; font-size:46px; font-weight:300; letter-spacing:0.18em; color:var(--gold); margin-top:10px; line-height:1;">Hala</div>
+        <div style="font-size:9px; letter-spacing:0.5em; color:var(--text-muted); text-transform:uppercase; margin-top:5px;">Discover · Madinah</div>
+      </div>
+
+      <div class="tagline">Discover Saudi Arabia Differently</div>
+
+      <div class="btn-zone">
+        <a href="login.html" class="btn-gold">Log In</a>
+        <a href="signup.html" class="btn-ghost">Create Account</a>
+        <div class="guest-link" onclick="enterAsGuest()">Continue as Guest →</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+
+  <script>
+    // If already logged in, skip to home
+    auth.onAuthStateChanged(user => {
+      if (user) window.location.href = 'home.html';
+    });
+
+    function enterAsGuest() {
+      auth.signInAnonymously()
+        .then(() => window.location.href = 'home.html')
+        .catch(err => console.error('Guest sign-in failed:', err));
+    }
+  </script>
+</body>
+</html>

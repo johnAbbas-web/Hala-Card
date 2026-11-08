@@ -1,0 +1,17 @@
+# ── Secrets: keep on your computer / server only, never in git ──
+pwa/api/secrets.php
+app2/js/mapbox-token.js
+pwa/js/mapbox-token.js
+expo/api/config.php
+
+# ── Personal data from sign-ups (real people's names and emails) ──
+signups.txt
+**/signups.txt
+**/pending-signups.txt
+expo/data/*
+!expo/data/.htaccess
+!expo/data/index.php
+
+# ── Local tooling ──
+.claude/
+*.zip

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Premium Card Signup</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 500px;
+        }
+        
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .price-box {
+            background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 25px;
+            border: 2px dashed #667eea;
+        }
+        
+        .price {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .price small {
+            font-size: 16px;
+            color: #666;
+        }
+        
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .card-preview {
+            margin-top: 30px;
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .secure-badge {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .secure-badge i {
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Get Your Premium Card</h2>
+        
+        <div class="price-box">
+            <div class="price">£9.99 <small>one-time payment</small></div>
+            <p style="margin-top: 10px; color: #666;">Your personalized premium card</p>
+        </div>
+        
+        <form action="process-signup.php" method="POST">
+            <div class="form-group">
+                <label for="name">Your Full Name (as it will appear on card)</label>
+                <input type="text" id="name" name="name" required placeholder="e.g., John Doe">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Your Email Address</label>
+                <input type="email" id="email" name="email" required placeholder="e.g., john@example.com">
+            </div>
+            
+            <button type="submit">Pay Now & Get My Card →</button>
+        </form>
+        
+        <div class="secure-badge">
+            <i>🔒</i> Secure payment powered by Stripe
+        </div>
+        
+        <div class="card-preview">
+            <h3>Your card will look like this:</h3>
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 10px; color: white;">
+                <div style="font-size: 14px; opacity: 0.9;">Premium Membership Card</div>
+                <div style="font-size: 24px; font-weight: bold; margin: 10px 0;">Your Name Here</div>
+                <div style="font-size: 12px;">Member since 2024</div>
+                <div style="font-size: 14px; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.3);">CARD-1234</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

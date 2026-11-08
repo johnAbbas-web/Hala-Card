@@ -1,0 +1,12 @@
+# Block direct public access to the signups file — it contains real people's
+# emails, so it should only ever be opened via your Hostinger File Manager
+# or FTP, never by someone guessing the URL in a browser.
+<Files "signups.txt">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</Files>

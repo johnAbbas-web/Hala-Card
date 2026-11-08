@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#061506" />
+  <title>Hala — Admin</title>
+  <link rel="stylesheet" href="css/styles.css" />
+
+  <style>
+    body { overflow-x: hidden; }
+
+    .admin-page {
+      min-height: 100vh;
+      padding: 30px 20px 60px;
+    }
+
+    .admin-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(180,145,60,0.1);
+    }
+
+    .admin-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      font-weight: 300;
+      color: var(--gold);
+      letter-spacing: 0.06em;
+    }
+
+    .admin-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Login gate */
+    .admin-login {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 28px;
+    }
+
+    /* Form card */
+    .form-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(180,145,60,0.14);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .form-card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      font-weight: 400;
+      color: rgba(210,180,100,0.8);
+      margin-bottom: 18px;
+      letter-spacing: 0.04em;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .form-select {
+      width: 100%;
+      padding: 13px 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(180,145,60,0.2);
+      border-radius: var(--radius-sm);
+      font-family: 'Tajawal', sans-serif;
+      font-size: 14px;
+      color: var(--text-primary);
+      outline: none;
+      appearance: none;
+      cursor: pointer;
+    }
+    .form-select option { background: #0d2e0d; }
+
+    .form-textarea {
+      width: 100%;
+      padding: 13px 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(180,145,60,0.2);
+      border-radius: var(--radius-sm);
+      font-family: 'Tajawal', sans-serif;
+      font-size: 14px;
+      color: var(--text-primary);
+      outline: none;
+      resize: vertical;
+      min-height: 80px;
+      transition: border-color 0.2s;
+    }
+    .form-textarea::placeholder { color: rgba(180,145,60,0.22); }
+    .form-textarea:focus { border-color: rgba(180,145,60,0.45); }
+
+    /* Locations list */
+    .loc-list-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(180,145,60,0.07);
+    }
+    .loc-list-item:last-child { border-bottom: none; }
+
+    .loc-list-thumb {
+      width: 48px; height: 48px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: rgba(180,145,60,0.08);
+      flex-shrink: 0;
+    }
+
+    .loc-list-info { flex: 1; }
+    .loc-list-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15px;
+      color: var(--text-primary);
+    }
+    .loc-list-meta {
+      font-size: 11px;
+      color: rgba(180,145,60,0.4);
+      margin-top: 1px;
+    }
+
+    .loc-list-actions { display: flex; gap: 8px; }
+
+    .btn-sm {
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      border: 1px solid;
+      transition: opacity 0.2s;
+      font-family: 'Tajawal', sans-serif;
+    }
+    .btn-sm:hover { opacity: 0.7; }
+
+    .btn-edit {
+      background: rgba(180,145,60,0.1);
+      border-color: rgba(180,145,60,0.3);
+      color: var(--gold-dim);
+    }
+
+    .btn-del {
+      background: rgba(220,80,80,0.08);
+      border-color: rgba(220,80,80,0.25);
+      color: rgba(220,120,120,0.7);
+    }
+
+    /* Image upload */
+    .img-upload-area {
+      border: 2px dashed rgba(180,145,60,0.2);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      position: relative;
+    }
+    .img-upload-area:hover { border-color: rgba(180,145,60,0.4); }
+    .img-upload-area input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+    .img-upload-label {
+      font-size: 12px;
+      color: rgba(180,145,60,0.45);
+      letter-spacing: 0.06em;
+    }
+    .img-preview {
+      width: 100%; max-height: 140px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .coord-hint {
+      font-size: 10px;
+      color: rgba(180,145,60,0.35);
+      margin-top: 6px;
+    }
+
+    .featured-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+    .featured-toggle label {
+      font-size: 13px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="hala-bg">
+    <div class="arabesque"></div>
+
+    <!-- Admin Login Gate -->
+    <div id="loginGate" class="admin-login">
+      <div class="logo-wrap" style="margin-bottom:32px;">
+        <img src="assets/logo.png" alt="Hala" style="width:60px; height:60px; object-fit:contain; opacity:0.8;" />
+        <div style="font-family:'Cormorant Garamond',serif; font-size:36px; font-weight:300; color:var(--gold); margin-top:8px;">Admin</div>
+        <div style="font-size:10px; letter-spacing:0.4em; color:var(--text-muted); text-transform:uppercase;">Hala Dashboard</div>
+      </div>
+
+      <div style="width:100%; max-width:340px;">
+        <div class="form-group">
+          <label class="form-label">Admin Email</label>
+          <input class="form-input" type="email" id="adminEmail" placeholder="admin@hala.sa" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" type="password" id="adminPassword" placeholder="••••••••" />
+        </div>
+        <button class="btn-gold" onclick="adminLogin()" style="margin-top:8px;">Access Dashboard</button>
+      </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="dashboard" class="admin-page" style="display:none;">
+
+      <div class="admin-header">
+        <div>
+          <div class="admin-title">Admin</div>
+          <div class="admin-sub">Hala Content Dashboard</div>
+        </div>
+        <button class="btn-sm btn-edit" onclick="adminLogout()">Sign Out</button>
+      </div>
+
+      <!-- Add New Location -->
+      <div class="form-card" id="locationForm">
+        <div class="form-card-title" id="formTitle">Add New Location</div>
+
+        <input type="hidden" id="editingId" value="" />
+
+        <div class="form-group">
+          <label class="form-label">Location Name *</label>
+          <input class="form-input" type="text" id="locName" placeholder="e.g. Masjid Al-Nabawi" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Category *</label>
+            <select class="form-select" id="locCat">
+              <option value="">Select…</option>
+              <option value="Masjid">Masjid</option>
+              <option value="Experience">Experience</option>
+              <option value="Café">Café</option>
+              <option value="Restaurant">Restaurant</option>
+              <option value="Culture">Culture</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Dessert">Dessert</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Address</label>
+            <input class="form-input" type="text" id="locAddress" placeholder="Street, District" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" id="locDesc" placeholder="Brief description of this location…"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Latitude *</label>
+            <input class="form-input" type="number" id="locLat" placeholder="24.4686" step="any" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Longitude *</label>
+            <input class="form-input" type="number" id="locLng" placeholder="39.6142" step="any" />
+          </div>
+        </div>
+        <div class="coord-hint">
+          💡 Get coordinates from <a href="https://maps.google.com" target="_blank" style="color:var(--gold-dim);">Google Maps</a> → right-click any point → copy the numbers
+        </div>
+
+        <div class="form-group" style="margin-top:16px;">
+          <label class="form-label">Hala Pass Offer (leave blank if none)</label>
+          <input class="form-input" type="text" id="locOffer" placeholder="e.g. 10% discount on all orders" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Location Image</label>
+          <div class="img-upload-area">
+            <img id="imgPreview" class="img-preview" style="display:none;" />
+            <div class="img-upload-label" id="uploadLabel">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(180,145,60,0.4)" stroke-width="1.5" style="margin-bottom:8px;">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+              </svg>
+              <br/>Tap to upload image
+            </div>
+            <input type="file" id="locImage" accept="image/*" onchange="previewImage(this)" />
+          </div>
+        </div>
+
+        <div class="featured-toggle">
+          <input type="checkbox" id="locFeatured" />
+          <label for="locFeatured">Show in Featured / Top Destinations</label>
+        </div>
+
+        <div style="display:flex; gap:12px; margin-top:20px;">
+          <button class="btn-gold" style="flex:1;" onclick="saveLocation()">Save Location</button>
+          <button class="btn-ghost" style="flex:0 0 auto; padding:0 18px;" onclick="clearForm()">Clear</button>
+        </div>
+      </div>
+
+      <!-- Existing Locations List -->
+      <div class="form-card">
+        <div class="form-card-title">All Locations</div>
+        <div id="locationsList">
+          <div style="height:60px;" class="skeleton" style="border-radius:10px;"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+
+  <script>
+    // ---- Set the admin email(s) allowed to access this page ----
+    const ADMIN_EMAILS = ['admin@hala.sa', 'zaahid0503@gmail.com'];
+
+    let selectedFile = null;
+
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast' + (isError ? ' error' : '');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    // ---------- Admin Login ----------
+    async function adminLogin() {
+      const email = document.getElementById('adminEmail').value.trim();
+      const pass  = document.getElementById('adminPassword').value;
+
+      try {
+        const cred = await auth.signInWithEmailAndPassword(email, pass);
+        if (!ADMIN_EMAILS.includes(cred.user.email)) {
+          await auth.signOut();
+          showToast('Access denied — not an admin account.', true);
+          return;
+        }
+        showDashboard();
+      } catch (err) {
+        showToast('Login failed: ' + (err.message || 'Check credentials'), true);
+      }
+    }
+
+    function adminLogout() {
+      auth.signOut();
+      document.getElementById('loginGate').style.display = 'flex';
+      document.getElementById('dashboard').style.display = 'none';
+    }
+
+    function showDashboard() {
+      document.getElementById('loginGate').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      loadLocations();
+    }
+
+    auth.onAuthStateChanged(user => {
+      if (user && ADMIN_EMAILS.includes(user.email)) showDashboard();
+    });
+
+    // ---------- Image preview ----------
+    function previewImage(input) {
+      selectedFile = input.files[0];
+      if (!selectedFile) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        document.getElementById('imgPreview').src = e.target.result;
+        document.getElementById('imgPreview').style.display = 'block';
+        document.getElementById('uploadLabel').style.display = 'none';
+      };
+      reader.readAsDataURL(selectedFile);
+    }
+
+    // ---------- Save Location ----------
+    async function saveLocation() {
+      const id      = document.getElementById('editingId').value;
+      const name    = document.getElementById('locName').value.trim();
+      const cat     = document.getElementById('locCat').value;
+      const address = document.getElementById('locAddress').value.trim();
+      const desc    = document.getElementById('locDesc').value.trim();
+      const lat     = parseFloat(document.getElementById('locLat').value);
+      const lng     = parseFloat(document.getElementById('locLng').value);
+      const offer   = document.getElementById('locOffer').value.trim();
+      const featured = document.getElementById('locFeatured').checked;
+
+      if (!name || !cat || isNaN(lat) || isNaN(lng)) {
+        showToast('Name, category, and coordinates are required.', true);
+        return;
+      }
+
+      let imageURL = '';
+
+      // Upload image if selected
+      if (selectedFile) {
+        const ref  = storage.ref(`locations/${Date.now()}_${selectedFile.name}`);
+        const snap = await ref.put(selectedFile);
+        imageURL   = await snap.ref.getDownloadURL();
+      }
+
+      const data = {
+        name, category: cat, address, description: desc,
+        coordinates: { lat, lng },
+        halaOffer: offer,
+        featured,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      if (imageURL) data.imageURL = imageURL;
+
+      try {
+        if (id) {
+          await db.collection('locations').doc(id).update(data);
+          showToast('Location updated successfully.');
+        } else {
+          data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          await db.collection('locations').add(data);
+          showToast('Location added successfully.');
+        }
+        clearForm();
+        loadLocations();
+      } catch (err) {
+        showToast('Error saving: ' + err.message, true);
+      }
+    }
+
+    // ---------- Load Locations ----------
+    async function loadLocations() {
+      const snap = await db.collection('locations').orderBy('createdAt', 'desc').get();
+      const list = document.getElementById('locationsList');
+
+      if (snap.empty) {
+        list.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-muted); font-size:13px;">No locations yet. Add your first one above.</div>';
+        return;
+      }
+
+      list.innerHTML = snap.docs.map(d => {
+        const loc = d.data();
+        return `
+          <div class="loc-list-item">
+            ${loc.imageURL
+              ? `<img class="loc-list-thumb" src="${loc.imageURL}" alt="${loc.name}" />`
+              : `<div class="loc-list-thumb" style="display:flex;align-items:center;justify-content:center;border-radius:10px;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(180,145,60,0.3)" stroke-width="1.5">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+                  </svg>
+                </div>`
+            }
+            <div class="loc-list-info">
+              <div class="loc-list-name">${loc.name}</div>
+              <div class="loc-list-meta">${loc.category || ''} · ${loc.halaOffer ? '✦ Hala offer' : 'No offer'}</div>
+            </div>
+            <div class="loc-list-actions">
+              <button class="btn-sm btn-edit" onclick="editLocation('${d.id}')">Edit</button>
+              <button class="btn-sm btn-del" onclick="deleteLocation('${d.id}', '${loc.name}')">Del</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ---------- Edit ----------
+    async function editLocation(id) {
+      const snap = await db.collection('locations').doc(id).get();
+      const loc  = snap.data();
+
+      document.getElementById('editingId').value    = id;
+      document.getElementById('locName').value      = loc.name || '';
+      document.getElementById('locCat').value       = loc.category || '';
+      document.getElementById('locAddress').value   = loc.address || '';
+      document.getElementById('locDesc').value      = loc.description || '';
+      document.getElementById('locLat').value       = loc.coordinates?.lat || '';
+      document.getElementById('locLng').value       = loc.coordinates?.lng || '';
+      document.getElementById('locOffer').value     = loc.halaOffer || '';
+      document.getElementById('locFeatured').checked = loc.featured || false;
+
+      if (loc.imageURL) {
+        document.getElementById('imgPreview').src = loc.imageURL;
+        document.getElementById('imgPreview').style.display = 'block';
+        document.getElementById('uploadLabel').style.display = 'none';
+      }
+
+      document.getElementById('formTitle').textContent = 'Edit Location';
+      document.getElementById('locationForm').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ---------- Delete ----------
+    async function deleteLocation(id, name) {
+      if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+      await db.collection('locations').doc(id).delete();
+      showToast(`"${name}" deleted.`);
+      loadLocations();
+    }
+
+    // ---------- Clear form ----------
+    function clearForm() {
+      document.getElementById('editingId').value = '';
+      document.getElementById('locName').value   = '';
+      document.getElementById('locCat').value    = '';
+      document.getElementById('locAddress').value = '';
+      document.getElementById('locDesc').value   = '';
+      document.getElementById('locLat').value    = '';
+      document.getElementById('locLng').value    = '';
+      document.getElementById('locOffer').value  = '';
+      document.getElementById('locFeatured').checked = false;
+      document.getElementById('imgPreview').style.display = 'none';
+      document.getElementById('uploadLabel').style.display = 'block';
+      document.getElementById('locImage').value = '';
+      document.getElementById('formTitle').textContent = 'Add New Location';
+      selectedFile = null;
+    }
+
+    // Enter key on password
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && document.getElementById('loginGate').style.display !== 'none') adminLogin();
+    });
+  </script>
+</body>
+</html>

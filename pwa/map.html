@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <meta name="theme-color" content="#040f04"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="Hala"/>
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png"/>
+  <title>Hala — Map</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="icon" href="assets/icons/favicon.png"/>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet"/>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+  <style>
+    body { overflow: hidden; height: 100vh; }
+    #map { position: fixed; inset: 0; width: 100%; height: 100%; }
+
+    .map-top {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+      padding: 14px 14px 10px;
+      background: linear-gradient(to bottom, rgba(4,10,4,0.88) 0%, transparent 100%);
+    }
+    .search-row { display: flex; gap: 9px; align-items: center; }
+    .back-btn {
+      width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+      background: rgba(4,10,4,0.88); border: 1px solid rgba(201,168,76,0.22);
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none; backdrop-filter: blur(12px); transition: border-color 0.2s;
+    }
+    .back-btn:hover { border-color: rgba(201,168,76,0.45); }
+    .map-search {
+      flex: 1; padding: 12px 16px;
+      background: rgba(4,10,4,0.88); border: 1px solid rgba(201,168,76,0.18);
+      border-radius: 50px; font-family: 'Inter', sans-serif; font-size: 13px;
+      color: var(--text-pri); outline: none; backdrop-filter: blur(12px); transition: border-color 0.2s;
+    }
+    .map-search::placeholder { color: rgba(255,245,220,0.28); }
+    .map-search:focus { border-color: rgba(201,168,76,0.42); }
+
+    .chips { display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none; margin-top: 9px; padding-bottom: 2px; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+      flex-shrink: 0; padding: 6px 13px;
+      background: rgba(4,10,4,0.85); border: 1px solid rgba(201,168,76,0.16);
+      border-radius: 50px; font-family: 'Inter', sans-serif; font-size: 11px;
+      font-weight: 500; letter-spacing: 0.06em; color: rgba(255,245,220,0.45);
+      cursor: pointer; white-space: nowrap; backdrop-filter: blur(10px);
+      transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+    }
+    .chip.active, .chip:hover { background: rgba(201,168,76,0.14); border-color: rgba(201,168,76,0.45); color: var(--gold); }
+    .chip-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+    .hala-marker {
+      width: 34px; height: 34px;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.45);
+      border: 1.5px solid rgba(255,255,255,0.15);
+      transition: transform 0.18s, box-shadow 0.18s;
+    }
+    .hala-marker:hover { transform: rotate(-45deg) scale(1.22); box-shadow: 0 6px 20px rgba(0,0,0,0.5); }
+    .hala-marker svg { transform: rotate(45deg); width: 15px; height: 15px; pointer-events: none; }
+
+    .mk-museums    { background: radial-gradient(circle at 35% 35%, #7ab87a, #4a7a4a); }
+    .mk-historic   { background: radial-gradient(circle at 35% 35%, #e8c96a, #a08030); }
+    .mk-nature     { background: radial-gradient(circle at 35% 35%, #5abf7a, #2a7a4a); }
+    .mk-cafe       { background: radial-gradient(circle at 35% 35%, #d4b896, #907060); }
+    .mk-restaurant { background: radial-gradient(circle at 35% 35%, #c9a87a, #7a6040); }
+    .mk-dessert    { background: radial-gradient(circle at 35% 35%, #e8d0a0, #a08050); }
+    .mk-shopping   { background: radial-gradient(circle at 35% 35%, #8abf9a, #4a7a5a); }
+    .mk-default    { background: radial-gradient(circle at 35% 35%, #c9a84c, #7a6020); }
+
+    .user-pulse-outer {
+      width: 22px; height: 22px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      animation: pulseRing 2s ease-out infinite;
+    }
+    .user-pulse-inner { width: 12px; height: 12px; border-radius: 50%; background: #4da6ff; border: 2px solid #fff; box-shadow: 0 0 8px rgba(77,166,255,0.6); }
+    @keyframes pulseRing {
+      0%   { box-shadow: 0 0 0 0    rgba(77,166,255,0.45); }
+      70%  { box-shadow: 0 0 0 14px rgba(77,166,255,0); }
+      100% { box-shadow: 0 0 0 0    rgba(77,166,255,0); }
+    }
+
+    .sheet {
+      position: fixed; bottom: 68px; left: 0; right: 0; z-index: 30;
+      padding: 0 12px;
+      transform: translateY(120%);
+      transition: transform 0.42s cubic-bezier(0.34,1.18,0.64,1);
+    }
+    .sheet.open { transform: translateY(0); }
+    .sheet-card {
+      background: rgba(6,16,6,0.96);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 22px; overflow: hidden; position: relative;
+    }
+
+    .img-swiper { position: relative; width: 100%; height: 165px; overflow: hidden; }
+    .img-swiper::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
+      background: linear-gradient(to bottom, transparent, rgba(4,10,4,0.85));
+      pointer-events: none; z-index: 2;
+    }
+    .img-track  { display: flex; height: 100%; transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); }
+    .img-slide  { flex-shrink: 0; width: 100%; height: 100%; }
+    .img-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .img-slide-ph  { width: 100%; height: 100%; background: linear-gradient(135deg, rgba(201,168,76,0.07), rgba(26,74,26,0.35)); display: flex; align-items: center; justify-content: center; }
+
+    .swiper-dots { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; }
+    .swiper-dot  { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.35); transition: all 0.2s; cursor: pointer; }
+    .swiper-dot.active { background: var(--gold); width: 14px; border-radius: 3px; }
+    .swiper-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 28px; height: 28px; border-radius: 50%; background: rgba(0,0,0,0.5); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.85); font-size: 16px; backdrop-filter: blur(4px); }
+    .swiper-prev { left: 8px; } .swiper-next { right: 8px; }
+
+    .sheet-body {
+      padding: 14px 16px 16px;
+      background: linear-gradient(180deg, rgba(4,12,4,0.0) 0%, rgba(4,12,4,0.92) 25%, rgba(4,10,4,1.0) 100%);
+      margin-top: -2px;
+    }
+    .sheet-cat  { font-size: 9px; font-weight: 600; letter-spacing: 0.24em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 3px; }
+    .sheet-name { font-family: 'Cormorant Garamond', serif; font-size: 21px; font-weight: 400; color: var(--text-pri); margin-bottom: 5px; line-height: 1.2; }
+    .sheet-desc { font-size: 12px; color: rgba(255,245,220,0.5); line-height: 1.55; margin-bottom: 10px; }
+    .sheet-addr { display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(255,245,220,0.38); margin-bottom: 10px; }
+    .sheet-offer { background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.18); border-radius: 10px; padding: 9px 12px; margin-bottom: 12px; font-size: 11px; color: rgba(201,168,76,0.75); line-height: 1.5; }
+    .sheet-offer strong { display: block; font-size: 9px; font-weight: 700; letter-spacing: 0.2em; color: var(--gold); text-transform: uppercase; margin-bottom: 2px; }
+
+    .sheet-actions { display: flex; gap: 9px; }
+    .btn-dir { flex: 1; padding: 12px; background: linear-gradient(135deg, #b8943e, #e8c96a, #b8943e); border: none; border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #0a1a05; cursor: pointer; text-transform: uppercase; }
+    .btn-dir:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-fav { width: 46px; background: rgba(255,255,255,0.04); border: 1px solid rgba(201,168,76,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+    .btn-fav.saved { background: rgba(201,168,76,0.12); border-color: rgba(201,168,76,0.4); }
+    .close-sheet { position: absolute; top: 10px; right: 12px; width: 28px; height: 28px; border-radius: 50%; background: rgba(0,0,0,0.55); border: none; color: rgba(255,255,255,0.7); font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 5; backdrop-filter: blur(4px); }
+
+    .locate-btn { position: fixed; right: 14px; bottom: 160px; width: 44px; height: 44px; border-radius: 50%; background: rgba(4,10,4,0.9); border: 1px solid rgba(201,168,76,0.22); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; backdrop-filter: blur(12px); transition: border-color 0.2s; }
+    .locate-btn:hover { border-color: rgba(201,168,76,0.48); }
+  </style>
+</head>
+<body>
+
+<button class="lang-toggle" id="langToggle" onclick="toggleLang()">AR</button>
+<div id="map"></div>
+
+<div class="map-top">
+  <div class="search-row">
+    <a href="home.html" class="back-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.65)" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </a>
+    <input class="map-search" id="srch" type="text" placeholder="Search locations…" oninput="filterMap()"/>
+  </div>
+  <div class="chips">
+    <div class="chip active" onclick="setCat('all',this)" data-en="All" data-ar="الكل">All</div>
+    <div class="chip" onclick="setCat('Museums & Culture',this)"><div class="chip-dot" style="background:#7ab87a;"></div><span data-en="Museums & Culture" data-ar="المتاحف والثقافة">Museums & Culture</span></div>
+    <div class="chip" onclick="setCat('Historic & Religious Sites',this)"><div class="chip-dot" style="background:#e8c96a;"></div><span data-en="Historic & Religious" data-ar="المواقع التاريخية والدينية">Historic & Religious</span></div>
+    <div class="chip" onclick="setCat('Nature & Outdoor',this)"><div class="chip-dot" style="background:#5abf7a;"></div><span data-en="Nature & Outdoor" data-ar="الطبيعة والهواء الطلق">Nature & Outdoor</span></div>
+    <div class="chip" onclick="setCat('Cafes & Coffee Spots',this)"><div class="chip-dot" style="background:#d4b896;"></div><span data-en="Cafés" data-ar="المقاهي">Cafés</span></div>
+    <div class="chip" onclick="setCat('Restaurants & Dining',this)"><div class="chip-dot" style="background:#c9a87a;"></div><span data-en="Restaurants" data-ar="المطاعم">Restaurants</span></div>
+    <div class="chip" onclick="setCat('Desserts',this)"><div class="chip-dot" style="background:#e8d0a0;"></div><span data-en="Desserts" data-ar="الحلويات">Desserts</span></div>
+    <div class="chip" onclick="setCat('Shopping & Malls',this)"><div class="chip-dot" style="background:#8abf9a;"></div><span data-en="Shopping" data-ar="التسوق">Shopping</span></div>
+  </div>
+</div>
+
+<div class="locate-btn" onclick="locateUser()">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.65)" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+</div>
+
+<div class="sheet" id="sheet">
+  <div class="sheet-card">
+    <button class="close-sheet" onclick="closeSheet()">✕</button>
+    <div id="sheetContent"></div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <a href="home.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.32)" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><span class="nav-lbl" data-en="Home" data-ar="الرئيسية">Home</span></a>
+  <a href="map.html" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.9)" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg><span class="nav-lbl" style="color:var(--gold);" data-en="Map" data-ar="الخريطة">Map</span></a>
+  <a href="card.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.32)" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-4 0v2"/></svg><span class="nav-lbl" data-en="Card" data-ar="البطاقة">Card</span></a>
+  <a href="profile.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.32)" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="nav-lbl" data-en="Profile" data-ar="الملف">Profile</span></a>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/app.js"></script>
+<script src="js/mapbox-token.js"></script>
+<script>
+const MAPBOX_TOKEN = window.MAPBOX_TOKEN || ''; // set in js/mapbox-token.js (not in git)
+
+const CAT_CLASS = {
+  'Museums & Culture':          'mk-museums',
+  'Historic & Religious Sites': 'mk-historic',
+  'Nature & Outdoor':           'mk-nature',
+  'Cafes & Coffee Spots':       'mk-cafe',
+  'Restaurants & Dining':       'mk-restaurant',
+  'Desserts':                   'mk-dessert',
+  'Shopping & Malls':           'mk-shopping',
+};
+
+const CAT_ICONS = {
+  'Museums & Culture':
+    `<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="2" stroke-linecap="round"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>`,
+  'Historic & Religious Sites':
+    `<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`,
+  'Nature & Outdoor':
+    `<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="2" stroke-linecap="round"><path d="M12 22V12M3.5 8.5C3.5 5.5 7 2 12 2s8.5 3.5 8.5 6.5c0 4-4 7-8.5 9-4.5-2-8.5-5-8.5-9z"/></svg>`,
+  'Cafes & Coffee Spots':
+    `<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="2" stroke-linecap="round"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><path d="M6 1v3M10 1v3M14 1v3"/></svg>`,
+  'Restaurants & Dining':
+    `<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="2" stroke-linecap="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>`,
+  'Desserts':
+    `<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>`,
+  'Shopping & Malls':
+    `<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="2" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18"/><path d="M16 10a4 4 0 01-8 0"/></svg>`,
+};
+
+let map;
+let allPlaces      = [];
+let filteredPlaces = [];
+let htmlMarkers    = {};
+let userMarker     = null;
+let currentUser, userFavs = [];
+let activeCat = 'all';
+let swiperIdx = 0, swiperImages = [];
+
+requireAuth().then(async user => {
+  currentUser = user;
+
+  mapboxgl.accessToken = MAPBOX_TOKEN;
+
+  map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/dark-v11',
+    center: [39.6142, 24.4686],
+    zoom: 14.5,
+    attributionControl: false
+  });
+
+  map.on('click', () => closeSheet());
+
+  const params  = new URLSearchParams(window.location.search);
+  const placeId = params.get('place') || sessionStorage.getItem('hala_open_place') || null;
+  sessionStorage.removeItem('hala_open_place');
+
+  let mapStyleLoaded = false;
+  let dataLoaded     = false;
+
+  function onBothReady() {
+    if (!mapStyleLoaded || !dataLoaded) return;
+    buildMap(allPlaces);
+    if (placeId) {
+      const p = allPlaces.find(x => String(x.id) === placeId);
+      if (p && p.lat && p.lng) {
+        map.flyTo({ center: [parseFloat(p.lng), parseFloat(p.lat)], zoom: 16, duration: 900 });
+        setTimeout(() => openSheet(p), 1200);
+      }
+    }
+  }
+
+  map.on('load', () => { mapStyleLoaded = true; onBothReady(); });
+
+  try {
+    const [pRes, fRes] = await Promise.all([apiCall('/places'), apiCall('/favourites')]);
+    allPlaces      = pRes.places || [];
+    filteredPlaces = allPlaces;
+    userFavs       = (fRes.favourites || []).map(f => String(f.id));
+    dataLoaded     = true;
+    onBothReady();
+  } catch(e) {
+    showToast('Could not load places.', true);
+  }
+});
+
+function buildMap(places) {
+  Object.values(htmlMarkers).forEach(m => m.remove());
+  htmlMarkers = {};
+
+  ['cluster-glow','clusters','cluster-count','unclustered-invisible']
+    .forEach(id => { if (map.getLayer(id)) map.removeLayer(id); });
+  if (map.getSource('hala-places')) map.removeSource('hala-places');
+
+  const geojson = {
+    type: 'FeatureCollection',
+    features: places.filter(p => p.lat && p.lng).map(p => ({
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [parseFloat(p.lng), parseFloat(p.lat)] },
+      properties: { id: String(p.id) }
+    }))
+  };
+
+  map.addSource('hala-places', {
+    type: 'geojson', data: geojson,
+    cluster: true, clusterMaxZoom: 15, clusterRadius: 55
+  });
+
+  map.addLayer({
+    id: 'cluster-glow', type: 'circle', source: 'hala-places',
+    filter: ['has', 'point_count'],
+    paint: {
+      'circle-color': 'rgba(0,0,0,0)',
+      'circle-radius': ['step',['get','point_count'], 28, 5, 36, 20, 46],
+      'circle-stroke-width': 7,
+      'circle-stroke-color': ['step',['get','point_count'],'rgba(201,168,76,0.13)',5,'rgba(201,168,76,0.17)',20,'rgba(201,168,76,0.22)']
+    }
+  });
+
+  map.addLayer({
+    id: 'clusters', type: 'circle', source: 'hala-places',
+    filter: ['has', 'point_count'],
+    paint: {
+      'circle-color': ['step',['get','point_count'],'#c9a84c',5,'#d4b45a',20,'#e8c96a'],
+      'circle-radius': ['step',['get','point_count'], 18, 5, 24, 20, 32],
+      'circle-stroke-width': 2,
+      'circle-stroke-color': 'rgba(255,255,255,0.18)'
+    }
+  });
+
+  map.addLayer({
+    id: 'cluster-count', type: 'symbol', source: 'hala-places',
+    filter: ['has', 'point_count'],
+    layout: {
+      'text-field': '{point_count_abbreviated}',
+      'text-font': ['DIN Offc Pro Medium','Arial Unicode MS Bold'],
+      'text-size': ['step',['get','point_count'], 13, 5, 15, 20, 17]
+    },
+    paint: { 'text-color': '#0a1a05' }
+  });
+
+  map.addLayer({
+    id: 'unclustered-invisible', type: 'circle', source: 'hala-places',
+    filter: ['!', ['has', 'point_count']],
+    paint: { 'circle-radius': 0, 'circle-opacity': 0 }
+  });
+
+  map.on('click', 'clusters', e => {
+    e.originalEvent.stopPropagation();
+    const features = map.queryRenderedFeatures(e.point, { layers: ['clusters'] });
+    if (!features.length) return;
+    map.getSource('hala-places').getClusterExpansionZoom(
+      features[0].properties.cluster_id,
+      (err, zoom) => {
+        if (err) return;
+        map.flyTo({ center: features[0].geometry.coordinates, zoom: zoom + 0.5, duration: 500 });
+      }
+    );
+  });
+
+  map.on('mouseenter', 'clusters', () => { map.getCanvas().style.cursor = 'pointer'; });
+  map.on('mouseleave', 'clusters', () => { map.getCanvas().style.cursor = ''; });
+
+  map.once('idle', () => renderAllMarkers());
+  map.on('zoomend', () => syncMarkersWithClusters());
+  map.on('moveend', () => syncMarkersWithClusters());
+}
+
+function renderAllMarkers() {
+  filteredPlaces.forEach(place => {
+    if (!place.lat || !place.lng) return;
+    const id = String(place.id);
+    if (htmlMarkers[id]) return;
+    createHtmlMarker(place);
+  });
+  syncMarkersWithClusters();
+}
+
+function createHtmlMarker(place) {
+  const id = String(place.id);
+  const el = document.createElement('div');
+  el.className = 'hala-marker ' + (CAT_CLASS[place.category] || 'mk-default');
+  el.innerHTML = CAT_ICONS[place.category] || CAT_ICONS['Historic & Religious Sites'];
+  el.addEventListener('click', e => { e.stopPropagation(); openSheet(place); });
+  const marker = new mapboxgl.Marker({ element: el, anchor: 'bottom-left' })
+    .setLngLat([parseFloat(place.lng), parseFloat(place.lat)])
+    .addTo(map);
+  htmlMarkers[id] = marker;
+}
+
+function syncMarkersWithClusters() {
+  if (!map.isStyleLoaded()) return;
+  const clusters = map.queryRenderedFeatures({ layers: ['clusters'] });
+  const clusterCircles = clusters.map(f => {
+    const pt    = map.project(f.geometry.coordinates);
+    const count = f.properties.point_count;
+    const r     = count > 19 ? 34 : count > 4 ? 26 : 20;
+    return { x: pt.x, y: pt.y, r: r + 6 };
+  });
+  Object.entries(htmlMarkers).forEach(([id, marker]) => {
+    const place = filteredPlaces.find(p => String(p.id) === id);
+    if (!place) return;
+    const pt = map.project([parseFloat(place.lng), parseFloat(place.lat)]);
+    const inCluster = clusterCircles.some(c => {
+      const dx = pt.x - c.x, dy = pt.y - c.y;
+      return Math.sqrt(dx*dx + dy*dy) < c.r;
+    });
+    marker.getElement().style.visibility = inCluster ? 'hidden' : 'visible';
+  });
+}
+
+function openSheet(p) {
+  const lang  = localStorage.getItem('hala_lang') || 'en';
+  const name  = (lang === 'ar' && p.name_ar)        ? p.name_ar        : p.name;
+  const desc  = (lang === 'ar' && p.description_ar) ? p.description_ar : p.description;
+  const addr  = (lang === 'ar' && p.address_ar)     ? p.address_ar     : p.address;
+  const offer = (lang === 'ar' && p.offer_ar)       ? p.offer_ar       : p.offer;
+
+  const images = [];
+  if (p.image_url) images.push(p.image_url);
+  if (p.images) {
+    try {
+      const ex = typeof p.images === 'string' ? JSON.parse(p.images) : p.images;
+      if (Array.isArray(ex)) images.push(...ex);
+    } catch(e) {}
+  }
+  swiperImages = [...new Set(images)];
+  swiperIdx    = 0;
+  const saved  = userFavs.includes(String(p.id));
+
+  document.getElementById('sheetContent').innerHTML = `
+    <div class="img-swiper">
+      <div class="img-track" id="imgTrack">
+        ${swiperImages.length
+          ? swiperImages.map(src => `<div class="img-slide"><img src="${src}" alt="${name}" loading="lazy"/></div>`).join('')
+          : `<div class="img-slide"><div class="img-slide-ph"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.25)" stroke-width="1.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div></div>`}
+      </div>
+      ${swiperImages.length > 1 ? `
+        <button class="swiper-arrow swiper-prev" onclick="swipe(-1)">‹</button>
+        <button class="swiper-arrow swiper-next" onclick="swipe(1)">›</button>
+        <div class="swiper-dots" id="swiperDots">
+          ${swiperImages.map((_,i) => `<div class="swiper-dot ${i===0?'active':''}" onclick="goSlide(${i})"></div>`).join('')}
+        </div>` : ''}
+    </div>
+    <div class="sheet-body">
+<div class="sheet-cat">${lang === 'ar' ? (CAT_AR[p.category] || p.category) : (p.category || 'Destination')}</div>
+      <div class="sheet-name">${name}</div>
+      ${desc ? `<div class="sheet-desc">${desc}</div>` : ''}
+      ${addr ? `<div class="sheet-addr"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>${addr}</div>` : ''}
+      ${offer ? `<div class="sheet-offer"><strong>Hala Offer</strong>${offer}${p.offer_expiry ? ` · <span style="opacity:0.6;">Until ${p.offer_expiry}</span>` : ''}</div>` : ''}
+      <div class="sheet-actions">
+        <button class="btn-dir" onclick="openDir('${(p.directions_url||'').replace(/'/g,"\\'")}',${p.lat||0},${p.lng||0})" ${!p.directions_url && !p.lat ? 'disabled' : ''}>${lang === 'ar' ? 'احصل على الاتجاهات' : 'Get Directions'}</button>
+        <button class="btn-fav ${saved?'saved':''}" id="favBtn-${p.id}" onclick="toggleFav(${p.id})">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="${saved?'#c9a84c':'none'}" stroke="${saved?'#c9a84c':'rgba(201,168,76,0.55)'}" stroke-width="1.8">
+            <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+          </svg>
+        </button>
+      </div>
+    </div>`;
+
+  document.getElementById('sheet').classList.add('open');
+  map.flyTo({ center: [parseFloat(p.lng), parseFloat(p.lat)], zoom: Math.max(map.getZoom(), 15), duration: 600, offset: [0, -120] });
+}
+
+function closeSheet() { document.getElementById('sheet').classList.remove('open'); }
+
+function swipe(dir) { goSlide(swiperIdx + dir); }
+function goSlide(idx) {
+  swiperIdx = (idx + swiperImages.length) % swiperImages.length;
+  document.getElementById('imgTrack').style.transform = `translateX(-${swiperIdx * 100}%)`;
+  document.querySelectorAll('.swiper-dot').forEach((d,i) => d.classList.toggle('active', i === swiperIdx));
+}
+
+function openDir(url, lat, lng) {
+  if (url) { window.open(url, '_blank'); return; }
+  if (lat && lng) window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank');
+}
+
+async function toggleFav(id) {
+  try {
+    const res = await apiCall('/favourites/toggle', 'POST', { place_id: id });
+    if (res.action === 'added') userFavs.push(String(id));
+    else userFavs = userFavs.filter(f => f !== String(id));
+    const btn   = document.getElementById('favBtn-' + id);
+    const added = userFavs.includes(String(id));
+    if (btn) {
+      btn.classList.toggle('saved', added);
+      const path = btn.querySelector('path');
+      if (path) {
+        path.setAttribute('fill',   added ? '#c9a84c' : 'none');
+        path.setAttribute('stroke', added ? '#c9a84c' : 'rgba(201,168,76,0.55)');
+      }
+    }
+    showToast(added ? 'Added to favourites' : 'Removed from favourites');
+  } catch(e) { showToast('Could not update.', true); }
+}
+
+function setCat(cat, el) {
+  activeCat = cat;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  applyFilters();
+}
+
+function filterMap() { applyFilters(); }
+
+function applyFilters() {
+  const q = document.getElementById('srch').value.trim().toLowerCase();
+  let f = allPlaces;
+
+  if (activeCat !== 'all') {
+    f = f.filter(p => p.category === activeCat);
+  }
+
+  if (q) {
+    f = f.filter(p =>
+      p.name?.toLowerCase().includes(q) ||
+      p.category?.toLowerCase().includes(q) ||
+      p.description?.toLowerCase().includes(q)
+    );
+
+    if (f.length === 1 && f[0].lat && f[0].lng) {
+      filteredPlaces = f;
+      buildMap(f);
+      map.flyTo({ center: [parseFloat(f[0].lng), parseFloat(f[0].lat)], zoom: 16, duration: 800 });
+      setTimeout(() => openSheet(f[0]), 900);
+      return;
+    }
+
+    if (f.length > 1) {
+      filteredPlaces = f;
+      buildMap(f);
+      const bounds = new mapboxgl.LngLatBounds();
+      f.forEach(p => { if (p.lat && p.lng) bounds.extend([parseFloat(p.lng), parseFloat(p.lat)]); });
+      map.fitBounds(bounds, { padding: 80, maxZoom: 15, duration: 800 });
+      return;
+    }
+  }
+
+  filteredPlaces = f;
+  closeSheet();
+  if (map && map.isStyleLoaded()) buildMap(f);
+
+  if (f.length === 1 && f[0].lat && f[0].lng) {
+    map.flyTo({ center: [parseFloat(f[0].lng), parseFloat(f[0].lat)], zoom: 15, duration: 800 });
+  } else if (f.length > 1) {
+    const valid = f.filter(p => p.lat && p.lng);
+    if (valid.length > 0) {
+      const bounds = new mapboxgl.LngLatBounds();
+      valid.forEach(p => bounds.extend([parseFloat(p.lng), parseFloat(p.lat)]));
+      map.fitBounds(bounds, { padding: 80, maxZoom: 15, duration: 800 });
+    }
+  }
+}
+
+function locateUser() {
+  navigator.geolocation?.getCurrentPosition(pos => {
+    const { longitude: lng, latitude: lat } = pos.coords;
+    if (userMarker) userMarker.remove();
+    const el = document.createElement('div');
+    el.innerHTML = `<div class="user-pulse-outer"><div class="user-pulse-inner"></div></div>`;
+    el.style.cssText = 'width:22px;height:22px;';
+    userMarker = new mapboxgl.Marker({ element: el }).setLngLat([lng, lat]).addTo(map);
+    map.flyTo({ center: [lng, lat], zoom: 15, duration: 900 });
+  });
+}
+</script>
+
+<script>
+    
+    const CAT_AR = {
+  'Museums & Culture':          'المتاحف والثقافة',
+  'Historic & Religious Sites': 'المواقع التاريخية والدينية',
+  'Nature & Outdoor':           'الطبيعة والهواء الطلق',
+  'Cafes & Coffee Spots':       'المقاهي',
+  'Restaurants & Dining':       'المطاعم',
+  'Desserts':                   'الحلويات',
+  'Shopping & Malls':           'التسوق',
+};
+(function() {
+  const lang = localStorage.getItem('hala_lang') || 'en';
+  const btn = document.getElementById('langToggle');
+  if (btn) btn.innerHTML = lang === 'ar'
+    ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg> إنجليزي'
+    : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg> عربي';
+  if (lang === 'ar') {
+    document.documentElement.setAttribute('dir', 'rtl');
+    document.documentElement.setAttribute('lang', 'ar');
+  }
+  document.querySelectorAll('[data-en]').forEach(el => {
+    const val = lang === 'ar' ? (el.getAttribute('data-ar') || el.getAttribute('data-en')) : el.getAttribute('data-en');
+    if (val) el.innerHTML = val;
+  });
+})();
+</script>
+
+</body>
+</html>

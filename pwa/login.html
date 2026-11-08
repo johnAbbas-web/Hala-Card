@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <meta name="theme-color" content="#040f04"/>
+  <title>Hala — Sign In</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="icon" href="assets/icons/favicon.png"/>
+  <style>
+    body { overflow-x: hidden; }
+
+    .auth-page {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 40px 24px 60px;
+      position: relative; z-index: 1;
+    }
+
+    /* Logo — bigger, no text */
+    .logo-zone {
+      display: flex; flex-direction: column; align-items: center;
+      margin-bottom: 36px;
+      animation: fadeUp 0.8s ease forwards; opacity: 0;
+    }
+
+    .logo-zone img {
+      width: 100px; height: 100px; object-fit: contain;
+      filter: drop-shadow(0 0 24px rgba(201,168,76,0.42))
+              drop-shadow(0 0 50px rgba(201,168,76,0.18));
+    }
+
+    /* Auth card */
+    .auth-card {
+      width: 100%; max-width: 400px;
+      background: rgba(10,25,10,0.6);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(201,168,76,0.18);
+      border-radius: 24px;
+      padding: 28px 26px 26px;
+      animation: fadeUp 0.8s 0.15s ease forwards; opacity: 0;
+    }
+
+    /* Tab switcher */
+    .tab-row {
+      display: flex;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: var(--r-md); padding: 4px; margin-bottom: 26px;
+    }
+    .tab-btn {
+      flex: 1; padding: 11px; border: none; background: transparent; border-radius: 11px;
+      font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+      letter-spacing: 0.1em; color: rgba(255,245,220,0.35);
+      cursor: pointer; text-transform: uppercase; transition: all 0.25s;
+    }
+    .tab-btn.active {
+      background: rgba(201,168,76,0.16); color: var(--gold);
+      border: 1px solid rgba(201,168,76,0.28);
+      box-shadow: 0 2px 12px rgba(201,168,76,0.1);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .auth-card .form-label { color: rgba(255,245,220,0.75); }
+    .auth-card .form-input {
+      background: rgba(255,255,255,0.09);
+      border-color: rgba(255,255,255,0.14);
+      color: rgba(255,245,220,0.95); font-size: 15px;
+    }
+    .auth-card .form-input::placeholder { color: rgba(255,245,220,0.26); }
+    .auth-card .form-input:focus { background: rgba(255,255,255,0.13); border-color: rgba(201,168,76,0.55); }
+
+    .forgot {
+      text-align: right; font-size: 12px; font-weight: 500;
+      color: rgba(201,168,76,0.48); cursor: pointer;
+      margin-top: -8px; margin-bottom: 20px; transition: color 0.2s;
+    }
+    .forgot:hover { color: var(--gold-dim); }
+
+    .strength-track { height: 3px; background: rgba(255,255,255,0.07); border-radius: 2px; margin-top: 7px; overflow: hidden; }
+    .strength-bar   { height: 100%; border-radius: 2px; transition: width 0.3s, background 0.3s; width: 0; }
+
+    .terms-row { display: flex; align-items: flex-start; gap: 10px; margin: 14px 0 20px; }
+    .terms-row input { margin-top: 3px; accent-color: var(--gold); flex-shrink: 0; }
+    .terms-text { font-size: 12px; color: rgba(255,245,220,0.48); line-height: 1.6; }
+    .terms-link { color: rgba(201,168,76,0.7); }
+
+    /* Corner ornaments */
+    .orn { position: fixed; width: 52px; height: 52px; pointer-events: none; opacity: 0.08; }
+    .orn-tl { top: 20px; left: 20px; border-top: 1px solid #c9a84c; border-left: 1px solid #c9a84c; }
+    .orn-tr { top: 20px; right: 20px; border-top: 1px solid #c9a84c; border-right: 1px solid #c9a84c; }
+    .orn-bl { bottom: 20px; left: 20px; border-bottom: 1px solid #c9a84c; border-left: 1px solid #c9a84c; }
+    .orn-br { bottom: 20px; right: 20px; border-bottom: 1px solid #c9a84c; border-right: 1px solid #c9a84c; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+    <button class="lang-toggle" id="langToggle" onclick="toggleLang()">AR</button>
+<div class="hala-bg">
+  <div class="arabesque"></div>
+  <div class="orn orn-tl"></div><div class="orn orn-tr"></div>
+  <div class="orn orn-bl"></div><div class="orn orn-br"></div>
+
+  <div class="auth-page">
+    <!-- Logo only — bigger, no text -->
+    <div class="logo-zone">
+      <img src="assets/logo.png" alt="Hala"/>
+    </div>
+
+    
+<div class="auth-card">
+  <div class="tab-row">
+    <button class="tab-btn active" onclick="switchTab('login',this)" data-en="Sign In" data-ar="تسجيل الدخول">Sign In</button>
+    <button class="tab-btn" onclick="switchTab('signup',this)" data-en="Create Account" data-ar="إنشاء حساب">Create Account</button>
+  </div>
+
+  <!-- Login -->
+  <div class="tab-panel active" id="panel-login">
+    <div class="form-group">
+      <label class="form-label" data-en="Email Address" data-ar="البريد الإلكتروني">Email Address</label>
+      <input class="form-input" type="email" id="l-email" placeholder="your@email.com" autocomplete="email"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-en="Password" data-ar="كلمة المرور">Password</label>
+      <div class="input-wrap">
+        <input class="form-input" type="password" id="l-pass" placeholder="Your password" autocomplete="current-password" style="padding-right:46px;"/>
+        <button class="eye-btn" type="button" onclick="toggleEye('l-pass',this)" tabindex="-1">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="forgot" onclick="forgotPassword()" data-en="Forgot password?" data-ar="نسيت كلمة المرور؟">Forgot password?</div>
+    <button class="btn-gold" onclick="doLogin()" data-en="Sign In" data-ar="تسجيل الدخول">Sign In</button>
+  </div>
+
+  <!-- Signup -->
+  <div class="tab-panel" id="panel-signup">
+    <div class="form-group">
+      <label class="form-label" data-en="Full Name" data-ar="الاسم الكامل">Full Name</label>
+      <input class="form-input" type="text" id="s-name" placeholder="Your full name" autocomplete="name"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-en="Email Address" data-ar="البريد الإلكتروني">Email Address</label>
+      <input class="form-input" type="email" id="s-email" placeholder="your@email.com" autocomplete="email"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-en="Password" data-ar="كلمة المرور">Password</label>
+      <div class="input-wrap">
+        <input class="form-input" type="password" id="s-pass" placeholder="Min. 8 characters" autocomplete="new-password" oninput="checkStrength(this.value)" style="padding-right:46px;"/>
+        <button class="eye-btn" type="button" onclick="toggleEye('s-pass',this)" tabindex="-1">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+      <div class="strength-track"><div class="strength-bar" id="sbar"></div></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-en="Confirm Password" data-ar="تأكيد كلمة المرور">Confirm Password</label>
+      <div class="input-wrap">
+        <input class="form-input" type="password" id="s-pass2" placeholder="Repeat password" autocomplete="new-password" style="padding-right:46px;"/>
+        <button class="eye-btn" type="button" onclick="toggleEye('s-pass2',this)" tabindex="-1">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="terms-row">
+      <input type="checkbox" id="terms"/>
+      <label class="terms-text" for="terms">
+        <span data-en="I agree to the" data-ar="أوافق على">I agree to the</span>
+        <span class="terms-link" data-en="Terms of Service" data-ar="شروط الخدمة">Terms of Service</span>
+        <span data-en="and" data-ar="و">and</span>
+        <span class="terms-link" data-en="Privacy Policy" data-ar="سياسة الخصوصية">Privacy Policy</span>
+      </label>
+    </div>
+    <button class="btn-gold" onclick="doSignup()" data-en="Create Account" data-ar="إنشاء حساب">Create Account</button>
+  </div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+  auth.onAuthStateChanged(user => { if (user) window.location.href = 'home.html'; });
+
+  function switchTab(tab, el) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('panel-' + tab).classList.add('active');
+  }
+
+  function toggleEye(id, btn) {
+    const inp = document.getElementById(id);
+    inp.type = inp.type === 'text' ? 'password' : 'text';
+    btn.style.color = inp.type === 'text' ? 'rgba(201,168,76,0.7)' : 'rgba(255,245,220,0.35)';
+  }
+
+  function checkStrength(v) {
+    const bar = document.getElementById('sbar');
+    let s = 0;
+    if (v.length >= 8) s++; if (/[A-Z]/.test(v)) s++; if (/[0-9]/.test(v)) s++; if (/[^A-Za-z0-9]/.test(v)) s++;
+    bar.style.width = (s / 4 * 100) + '%';
+    bar.style.background = s<=1?'#c0392b':s===2?'#e67e22':s===3?'#c9a84c':'#27ae60';
+  }
+
+  const ERRS = {
+    'auth/user-not-found':     'No account found with this email.',
+    'auth/wrong-password':     'Incorrect password.',
+    'auth/invalid-email':      'Please enter a valid email address.',
+    'auth/invalid-credential': 'Email or password is incorrect.',
+    'auth/email-already-in-use': 'An account with this email already exists.',
+    'auth/weak-password':      'Password must be at least 6 characters.',
+    'auth/too-many-requests':  'Too many attempts — try again later.'
+  };
+
+  async function doLogin() {
+    const email = document.getElementById('l-email').value.trim();
+    const pass  = document.getElementById('l-pass').value;
+    if (!email || !pass) return showToast('Please fill in all fields.', true);
+    setLoading(true);
+    try {
+      await auth.signInWithEmailAndPassword(email, pass);
+      window.location.href = 'home.html';
+    } catch(e) { setLoading(false); showToast(ERRS[e.code] || 'Sign-in failed.', true); }
+  }
+
+  async function doSignup() {
+    const name  = document.getElementById('s-name').value.trim();
+    const email = document.getElementById('s-email').value.trim();
+    const pass  = document.getElementById('s-pass').value;
+    const pass2 = document.getElementById('s-pass2').value;
+    if (!name)           return showToast('Please enter your name.', true);
+    if (!email)          return showToast('Please enter your email.', true);
+    if (pass.length < 8) return showToast('Password must be at least 8 characters.', true);
+    if (pass !== pass2)  return showToast('Passwords do not match.', true);
+    if (!document.getElementById('terms').checked) return showToast('Please accept the terms.', true);
+    setLoading(true);
+    try {
+      const cred = await auth.createUserWithEmailAndPassword(email, pass);
+      await cred.user.updateProfile({ displayName: name });
+      const token = await cred.user.getIdToken();
+      await fetch(API_BASE + '/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ name, email })
+      });
+      window.location.href = 'home.html';
+    } catch(e) { setLoading(false); showToast(ERRS[e.code] || 'Sign-up failed.', true); }
+  }
+
+  async function forgotPassword() {
+    const email = document.getElementById('l-email').value.trim();
+    if (!email) return showToast('Enter your email above first.', true);
+    try { await auth.sendPasswordResetEmail(email); showToast('Reset link sent — check your inbox.'); }
+    catch(e) { showToast('Could not send reset email.', true); }
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      if (document.getElementById('panel-login').classList.contains('active')) doLogin();
+      else doSignup();
+    }
+  });
+</script>
+
+<script>
+(function() {
+  const lang = localStorage.getItem('hala_lang') || 'en';
+  const btn = document.getElementById('langToggle');
+  if (btn) btn.innerHTML = lang === 'ar'
+    ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg> English'
+    : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg> عربي';
+  if (lang === 'ar') {
+    document.documentElement.setAttribute('dir', 'rtl');
+    document.documentElement.setAttribute('lang', 'ar');
+  }
+  document.querySelectorAll('[data-en]').forEach(el => {
+    const val = lang === 'ar' ? (el.getAttribute('data-ar') || el.getAttribute('data-en')) : el.getAttribute('data-en');
+    if (val) el.innerHTML = val;
+  });
+})();
+</script>
+</body>
+</html>

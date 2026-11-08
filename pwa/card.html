@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <meta name="theme-color" content="#040f04"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="Hala"/>
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png"/>
+  <title>Hala — Pass</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="icon" href="assets/icons/favicon.png"/>
+  <style>
+    body { overflow-x: hidden; }
+    .page { min-height: 100vh; padding-bottom: 90px; }
+
+    .page-hdr { padding: 56px 20px 22px; }
+    .page-hdr-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.38em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; }
+    .page-hdr-title { font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 300; color: rgba(255,245,220,0.95); }
+
+    .card-wrap { padding: 0 16px; margin-bottom: 20px; animation: cardReveal 0.9s cubic-bezier(0.22,1,0.36,1) forwards; opacity: 0; transform: translateY(20px); }
+    @keyframes cardReveal { to { opacity: 1; transform: translateY(0); } }
+
+    .mem-card { border-radius: 26px; overflow: hidden; position: relative; min-height: 220px; box-shadow: 0 24px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(201,168,76,0.28), inset 0 1px 0 rgba(255,255,255,0.08); }
+    .card-bg-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .card-bg-fallback { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 80% 20%, rgba(40,100,40,0.6) 0%, transparent 60%), radial-gradient(ellipse 60% 80% at 20% 80%, rgba(20,60,20,0.7) 0%, transparent 60%), linear-gradient(135deg, #071a07 0%, #0f3a10 30%, #1a5a1a 55%, #0a2a0a 100%); }
+    .card-pattern { position: absolute; inset: 0; opacity: 0.055; background-image: repeating-linear-gradient(30deg, rgba(201,168,76,0.6) 0px, transparent 1px, transparent 18px, rgba(201,168,76,0.6) 19px), repeating-linear-gradient(-30deg, rgba(201,168,76,0.6) 0px, transparent 1px, transparent 18px, rgba(201,168,76,0.6) 19px); }
+    .card-overlay { position: absolute; inset: 0; background: linear-gradient(160deg, rgba(4,12,4,0.45) 0%, rgba(4,12,4,0.25) 35%, rgba(4,12,4,0.65) 70%, rgba(4,12,4,0.88) 100%); }
+    .card-shimmer { position: absolute; inset: 0; background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.06) 45%, rgba(255,255,255,0.13) 50%, rgba(255,255,255,0.06) 55%, transparent 70%); background-size: 200% 100%; animation: cardShimmer 4s ease-in-out infinite; }
+    @keyframes cardShimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
+    .card-edge-glow { position: absolute; inset: 0; border-radius: 26px; box-shadow: inset 0 1px 0 rgba(201,168,76,0.35), inset 0 -1px 0 rgba(201,168,76,0.15), inset 1px 0 0 rgba(201,168,76,0.12), inset -1px 0 0 rgba(201,168,76,0.12); pointer-events: none; }
+
+    .card-locked-overlay { position: absolute; inset: 0; z-index: 5; background: rgba(4,10,4,0.75); backdrop-filter: blur(8px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; border-radius: 26px; transition: opacity 0.5s ease; }
+    .card-locked-overlay.unlocking { opacity: 0; pointer-events: none; }
+    .lock-icon { color: rgba(201,168,76,0.65); }
+    .lock-text { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; color: rgba(255,245,220,0.8); letter-spacing: 0.06em; }
+    .lock-sub { font-size: 11px; font-weight: 500; color: rgba(201,168,76,0.45); letter-spacing: 0.08em; text-align: center; padding: 0 20px; }
+
+    .card-content { position: relative; z-index: 2; padding: 24px 22px 22px; min-height: 220px; display: flex; flex-direction: column; justify-content: space-between; }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; }
+    .card-brand { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 300; letter-spacing: 0.16em; color: var(--gold); text-shadow: 0 2px 24px rgba(201,168,76,0.45); line-height: 1; }
+    .card-brand-sub { font-size: 8px; font-weight: 600; letter-spacing: 0.48em; color: rgba(201,168,76,0.48); text-transform: uppercase; margin-top: 4px; }
+    .card-badge { display: flex; align-items: center; gap: 6px; background: rgba(4,12,4,0.6); backdrop-filter: blur(12px); border: 1px solid rgba(201,168,76,0.32); border-radius: 20px; padding: 6px 13px; font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; }
+    .card-badge.active-badge { color: var(--gold); }
+    .card-badge.locked-badge { color: rgba(255,245,220,0.4); border-color: rgba(255,255,255,0.12); }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .dot-active { background: #2ecc71; box-shadow: 0 0 6px rgba(46,204,113,0.6); }
+    .dot-locked { background: rgba(255,255,255,0.3); }
+    .card-member-lbl { font-family: 'Inter', sans-serif; font-size: 8px; font-weight: 600; letter-spacing: 0.32em; color: rgba(201,168,76,0.42); text-transform: uppercase; margin-bottom: 4px; }
+    .card-member-name { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; color: rgba(255,245,220,0.95); letter-spacing: 0.06em; text-shadow: 0 1px 12px rgba(0,0,0,0.5); }
+    .card-number { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 400; letter-spacing: 0.26em; color: rgba(201,168,76,0.52); margin-top: 12px; font-variant-numeric: tabular-nums; }
+    .card-chip { position: absolute; bottom: 22px; right: 22px; z-index: 3; width: 44px; height: 33px; border-radius: 5px; background: linear-gradient(135deg, #f0d060 0%, #c9a84c 50%, #8a6820 100%); opacity: 0.72; box-shadow: 0 3px 12px rgba(201,168,76,0.35); }
+
+    .unlock-section { margin: 0 16px 24px; background: rgba(10,25,10,0.6); backdrop-filter: blur(20px); border: 1px solid rgba(201,168,76,0.18); border-radius: 20px; padding: 24px 22px; animation: fadeUp 0.6s ease forwards; opacity: 0; }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } from { opacity:0; transform:translateY(12px); } }
+    .unlock-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; color: rgba(255,245,220,0.9); margin-bottom: 6px; }
+    .unlock-sub { font-size: 12px; color: rgba(255,245,220,0.4); line-height: 1.6; margin-bottom: 20px; }
+    .unlock-form-group { margin-bottom: 14px; }
+    .unlock-label { display: block; font-size: 10px; font-weight: 600; letter-spacing: 0.18em; color: rgba(255,245,220,0.55); text-transform: uppercase; margin-bottom: 7px; }
+    .unlock-input { width: 100%; padding: 13px 16px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 14px; color: rgba(255,245,220,0.92); outline: none; transition: border-color 0.2s, background 0.2s; }
+    .unlock-input::placeholder { color: rgba(255,245,220,0.25); }
+    .unlock-input:focus { border-color: rgba(201,168,76,0.5); background: rgba(255,255,255,0.1); }
+    .unlock-input.code { letter-spacing: 0.2em; text-transform: uppercase; font-weight: 600; font-size: 16px; }
+    .btn-unlock { width: 100%; padding: 15px; background: linear-gradient(135deg, #b8943e 0%, #e8c96a 50%, #b8943e 100%); border: none; border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.18em; color: #0a1a05; cursor: pointer; text-transform: uppercase; position: relative; overflow: hidden; box-shadow: 0 4px 20px rgba(201,168,76,0.25); transition: opacity 0.2s; }
+    .btn-unlock:hover { opacity: 0.9; }
+    .btn-unlock::after { content: ''; position: absolute; top: 0; left: -80%; width: 60%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent); animation: shimmer 3s infinite; }
+    @keyframes shimmer { 0%{left:-80%} 100%{left:160%} }
+    .unlock-error { font-size: 12px; color: rgba(255,120,120,0.85); margin-top: 10px; text-align: center; display: none; }
+    .unlock-error.show { display: block; }
+
+    .staff-note { margin: 0 16px 24px; padding: 12px 16px; background: rgba(201,168,76,0.055); backdrop-filter: blur(12px); border: 1px solid rgba(201,168,76,0.11); border-radius: 14px; font-size: 12px; color: rgba(255,245,220,0.42); text-align: center; line-height: 1.65; display: none; }
+
+    .offers-sec { padding: 0 16px; display: none; }
+    .offer-item { display: flex; align-items: center; gap: 13px; padding: 14px 0; border-bottom: 1px solid rgba(201,168,76,0.07); cursor: pointer; transition: opacity 0.2s, transform 0.15s; }
+    .offer-item:hover { opacity: 0.75; transform: translateX(3px); }
+    .offer-item:last-child { border-bottom: none; }
+    .offer-thumb { width: 54px; height: 54px; border-radius: 14px; background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.14); overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .offer-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .offer-info { flex: 1; min-width: 0; }
+    .offer-name { font-family: 'Cormorant Garamond', serif; font-size: 17px; color: var(--text-pri); margin-bottom: 2px; }
+    .offer-deal { font-size: 11px; font-weight: 500; color: var(--gold-dim); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .offer-expiry { font-size: 10px; color: rgba(255,245,220,0.28); }
+    .offer-cat { font-size: 8px; font-weight: 600; letter-spacing: 0.18em; color: rgba(201,168,76,0.32); text-transform: uppercase; margin-top: 1px; }
+    .offer-arrow { color: rgba(201,168,76,0.28); font-size: 22px; flex-shrink: 0; }
+
+    @keyframes unlockPulse {
+      0%   { box-shadow: 0 24px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(201,168,76,0.28); }
+      50%  { box-shadow: 0 24px 60px rgba(0,0,0,0.55), 0 0 0 4px rgba(201,168,76,0.6), 0 0 40px rgba(201,168,76,0.25); }
+      100% { box-shadow: 0 24px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(201,168,76,0.28); }
+    }
+    .mem-card.just-unlocked { animation: unlockPulse 1.2s ease; }
+  </style>
+</head>
+<body>
+<button class="lang-toggle" id="langToggle" onclick="toggleLang()">AR</button>
+<div class="hala-bg">
+  <div class="arabesque"></div>
+  <div class="page">
+
+    <div class="page-hdr">
+      <div class="page-hdr-eyebrow" data-en="Exclusive Access" data-ar="وصول حصري">Exclusive Access</div>
+      <div class="page-hdr-title" data-en="Hala Pass" data-ar="بطاقة هلا">Hala Pass</div>
+    </div>
+
+    <div class="card-wrap">
+      <div class="mem-card" id="memCard">
+        <img src="assets/cardbg.webp" class="card-bg-img" alt="" onerror="this.style.display='none';document.getElementById('cardBgFallback').style.display='block'"/>
+        <div id="cardBgFallback" class="card-bg-fallback" style="display:none;"></div>
+        <div class="card-pattern"></div>
+        <div class="card-overlay"></div>
+        <div class="card-shimmer"></div>
+        <div class="card-edge-glow"></div>
+
+        <div class="card-locked-overlay" id="cardLockedOverlay">
+          <svg class="lock-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <div class="lock-text" data-en="Exclusive Access" data-ar="وصول حصري">Exclusive Access</div>
+          <div class="lock-sub" data-en="Activate your Hala Pass using your access code" data-ar="فعّل بطاقة هلا باستخدام رمز الوصول الخاص بك">Activate your Hala Pass using your access code</div>
+        </div>
+
+        <div class="card-content">
+          <div class="card-top">
+            <div>
+              <div class="card-brand">Hala</div>
+              <div class="card-brand-sub" data-en="Discovery Pass" data-ar="بطاقة الاكتشاف">Discovery Pass</div>
+            </div>
+            <div class="card-badge locked-badge" id="cardBadge">
+              <div class="status-dot dot-locked" id="statusDot"></div>
+              <span id="badgeText">Locked</span>
+            </div>
+          </div>
+          <div class="card-bottom">
+            <div class="card-member-lbl" data-en="Member" data-ar="العضو">Member</div>
+            <div class="card-member-name" id="cardName">Loading…</div>
+            <div class="card-number" id="cardNumber">HALA · ···· ···· ····</div>
+          </div>
+        </div>
+        <div class="card-chip"></div>
+      </div>
+    </div>
+
+    <div class="unlock-section" id="unlockSection">
+      <div class="unlock-title" data-en="Activate Your Pass" data-ar="فعّل بطاقتك">Activate Your Pass</div>
+      <div class="unlock-sub" data-en="A limited number of complimentary passes are available for early users. Enter your email and access code below to activate." data-ar="عدد محدود من البطاقات المجانية متاح للمستخدمين الأوائل. أدخل بريدك الإلكتروني ورمز الوصول أدناه للتفعيل.">A limited number of complimentary passes are available for early users. Enter your email and access code below to activate.</div>
+
+      <div class="unlock-form-group">
+        <label class="unlock-label" data-en="Email Address" data-ar="البريد الإلكتروني">Email Address</label>
+        <input class="unlock-input" type="email" id="unlockEmail" placeholder="your@email.com" autocomplete="email"/>
+      </div>
+
+      <div class="unlock-form-group">
+        <label class="unlock-label" data-en="Promo Code" data-ar="رمز الوصول">Promo Code</label>
+        <input class="unlock-input code" type="text" id="unlockCode" placeholder="ENTER CODE" maxlength="20" oninput="this.value=this.value.toUpperCase()"/>
+      </div>
+
+      <button class="btn-unlock" id="activateBtn" onclick="activatePass()">Activate Hala Pass</button>
+      <div class="unlock-error" id="unlockError">Invalid promo code. Please try again.</div>
+    </div>
+
+    <div class="staff-note" id="staffNote" data-en="Show this pass to staff at any Hala partner location to claim your exclusive offer." data-ar="أرِ هذه البطاقة للموظفين في أي موقع شريك لهلا للحصول على عرضك الحصري.">
+      Show this pass to staff at any Hala partner location to claim your exclusive offer.
+    </div>
+
+    <div class="offers-sec" id="offersSec">
+      <div class="sec-label" style="margin-bottom:16px;" data-en="Partner Offers" data-ar="عروض الشركاء">Partner Offers</div>
+      <div id="offersList">
+        <div style="height:72px;border-radius:12px;margin-bottom:12px;" class="skeleton"></div>
+        <div style="height:72px;border-radius:12px;margin-bottom:12px;" class="skeleton"></div>
+        <div style="height:72px;border-radius:12px;" class="skeleton"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="home.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.32)" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><span class="nav-lbl" data-en="Home" data-ar="الرئيسية">Home</span></a>
+    <a href="map.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.32)" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg><span class="nav-lbl" data-en="Map" data-ar="الخريطة">Map</span></a>
+    <a href="card.html" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.9)" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-4 0v2"/></svg><span class="nav-lbl" style="color:var(--gold);" data-en="Card" data-ar="البطاقة">Card</span></a>
+    <a href="profile.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.32)" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="nav-lbl" data-en="Profile" data-ar="الملف">Profile</span></a>
+  </nav>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/app.js"></script>
+<script>
+  const CAT_AR = {
+    'Museums & Culture': 'المتاحف والثقافة',
+    'Historic & Religious Sites': 'المواقع التاريخية والدينية',
+    'Nature & Outdoor': 'الطبيعة والهواء الطلق',
+    'Cafes & Coffee Spots': 'المقاهي',
+    'Restaurants & Dining': 'المطاعم',
+    'Desserts': 'الحلويات',
+    'Shopping & Malls': 'التسوق',
+  };
+
+  function generateCardNumber(uid) {
+    let hash = 0;
+    for (let i = 0; i < uid.length; i++) { hash = ((hash << 5) - hash) + uid.charCodeAt(i); hash |= 0; }
+    const abs = Math.abs(hash).toString().padStart(12, '0');
+    return 'HALA · ' + abs.slice(0,4) + ' · ' + abs.slice(4,8) + ' · ' + abs.slice(8,12);
+  }
+
+  function showActivatedState(animate = false) {
+    const lang = localStorage.getItem('hala_lang') || 'en';
+    document.getElementById('cardLockedOverlay').classList.add('unlocking');
+    document.getElementById('cardBadge').className = 'card-badge active-badge';
+    document.getElementById('statusDot').className = 'status-dot dot-active';
+    document.getElementById('badgeText').textContent = lang === 'ar' ? 'نشط' : 'Active';
+
+    if (animate) {
+      const card = document.getElementById('memCard');
+      setTimeout(() => card.classList.add('just-unlocked'), 500);
+      setTimeout(() => card.classList.remove('just-unlocked'), 1800);
+    }
+
+    document.getElementById('unlockSection').style.display = 'none';
+    document.getElementById('staffNote').style.display     = 'block';
+    document.getElementById('offersSec').style.display     = 'block';
+    loadOffers();
+  }
+
+  function showLockedState() {
+    document.getElementById('cardLockedOverlay').style.display = 'flex';
+    document.getElementById('unlockSection').style.display     = 'block';
+    document.getElementById('staffNote').style.display         = 'none';
+    document.getElementById('offersSec').style.display         = 'none';
+  }
+
+  requireAuth().then(async user => {
+    const lang = localStorage.getItem('hala_lang') || 'en';
+    document.getElementById('cardName').textContent   = user.displayName || user.email.split('@')[0];
+    document.getElementById('cardNumber').textContent = generateCardNumber(user.uid);
+    if (user.email) document.getElementById('unlockEmail').value = user.email;
+
+    // Update activate button text
+    document.getElementById('activateBtn').textContent = lang === 'ar' ? 'تفعيل بطاقة هلا' : 'Activate Hala Pass';
+
+    try {
+      const res = await apiCall('/pass');
+      if (res.activated) showActivatedState(false);
+      else showLockedState();
+    } catch(e) {
+      const data = JSON.parse(localStorage.getItem('hala_pass_activated') || '{}');
+      if (data[user.uid]) showActivatedState(false);
+      else showLockedState();
+    }
+  });
+
+  function activatePass() {
+    const lang  = localStorage.getItem('hala_lang') || 'en';
+    const email = document.getElementById('unlockEmail').value.trim();
+    const code  = document.getElementById('unlockCode').value.trim().toUpperCase();
+    const errEl = document.getElementById('unlockError');
+    errEl.classList.remove('show');
+
+    if (!email) { errEl.textContent = lang === 'ar' ? 'يرجى إدخال بريدك الإلكتروني.' : 'Please enter your email address.'; errEl.classList.add('show'); return; }
+    if (!code)  { errEl.textContent = lang === 'ar' ? 'يرجى إدخال رمز الوصول.' : 'Please enter your promo code.'; errEl.classList.add('show'); return; }
+
+    setLoading(true);
+    apiCall('/pass', 'POST', { code }).then(res => {
+      setLoading(false);
+      if (res.activated) {
+        showActivatedState(true);
+        showToast(lang === 'ar' ? 'تم تفعيل بطاقة هلا! أهلاً بك.' : 'Hala Pass activated! Welcome.');
+      }
+    }).catch(() => {
+      setLoading(false);
+      errEl.textContent = lang === 'ar' ? 'رمز الوصول غير صحيح. يرجى المحاولة مجدداً.' : 'Invalid promo code. Please check and try again.';
+      errEl.classList.add('show');
+      const inp = document.getElementById('unlockCode');
+      inp.style.borderColor = 'rgba(220,80,80,0.6)';
+      setTimeout(() => { inp.style.borderColor = ''; }, 2000);
+    });
+  }
+
+  function goToPlace(id) {
+    sessionStorage.setItem('hala_open_place', String(id));
+    window.location.href = 'map.html';
+  }
+
+  async function loadOffers() {
+    const lang = localStorage.getItem('hala_lang') || 'en';
+    try {
+      const res    = await apiCall('/places?has_offer=1');
+      const places = res.places || [];
+      const list   = document.getElementById('offersList');
+
+      if (!places.length) {
+        list.innerHTML = `<div style="padding:30px;text-align:center;font-size:13px;color:rgba(255,245,220,0.28);">${lang === 'ar' ? 'عروض الشركاء قريباً.' : 'Partner offers coming soon.'}</div>`;
+        return;
+      }
+
+      list.innerHTML = places.map(p => {
+        const name  = (lang === 'ar' && p.name_ar)  ? p.name_ar  : p.name;
+        const offer = (lang === 'ar' && p.offer_ar) ? p.offer_ar : p.offer;
+        const cat   = (lang === 'ar' && CAT_AR[p.category]) ? CAT_AR[p.category] : (p.category || '');
+        return `
+          <div class="offer-item" onclick="goToPlace(${p.id})">
+            <div class="offer-thumb">
+              ${p.image_url ? `<img src="${p.image_url}" alt="${name}"/>` : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.35)" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>`}
+            </div>
+            <div class="offer-info">
+              <div class="offer-name">${name}</div>
+              <div class="offer-deal">${offer}</div>
+              ${p.offer_expiry ? `<div class="offer-expiry">${lang === 'ar' ? 'صالح حتى' : 'Valid until'} ${p.offer_expiry}</div>` : ''}
+              <div class="offer-cat">${cat}</div>
+            </div>
+            <div class="offer-arrow">›</div>
+          </div>`;
+      }).join('');
+    } catch(e) {
+      document.getElementById('offersList').innerHTML = `<div style="padding:20px;text-align:center;font-size:13px;color:rgba(255,245,220,0.28);">${lang === 'ar' ? 'تعذر تحميل العروض.' : 'Could not load offers.'}</div>`;
+    }
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') activatePass(); });
+</script>
+
+<script>
+(function() {
+  const lang = localStorage.getItem('hala_lang') || 'en';
+  const btn = document.getElementById('langToggle');
+  if (btn) btn.innerHTML = lang === 'ar'
+    ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg> إنجليزي'
+    : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg> عربي';
+  if (lang === 'ar') {
+    document.documentElement.setAttribute('dir', 'rtl');
+    document.documentElement.setAttribute('lang', 'ar');
+  }
+  document.querySelectorAll('[data-en]').forEach(el => {
+    const val = lang === 'ar' ? (el.getAttribute('data-ar') || el.getAttribute('data-en')) : el.getAttribute('data-en');
+    if (val) el.innerHTML = val;
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+RewriteEngine On
+
+# Force HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Route API calls to PHP files
+RewriteRule ^api/places$              api/places.php [L,QSA]
+RewriteRule ^api/favourites$          api/favourites.php [L,QSA]
+RewriteRule ^api/favourites/toggle$   api/favourites.php [L,QSA]
+RewriteRule ^api/users$               api/users.php [L,QSA]
+RewriteRule ^api/users/register$      api/users.php [L,QSA]
+RewriteRule ^api/admin$               api/admin.php [L,QSA]
+RewriteRule ^api/pass$    api/pass.php [L,QSA]

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#061506" />
+  <title>Hala — Map</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="manifest" href="manifest.json" />
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+
+  <style>
+    body { overflow: hidden; height: 100vh; }
+
+    #map {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ---------- Top controls ---------- */
+    .map-top {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 20;
+      padding: 16px 16px 12px;
+    }
+
+    .map-search-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .back-circle {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: rgba(10,25,10,0.92);
+      border: 1px solid rgba(180,145,60,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      flex-shrink: 0;
+      backdrop-filter: blur(10px);
+      transition: border-color 0.2s;
+    }
+    .back-circle:hover { border-color: rgba(180,145,60,0.5); }
+
+    .map-search-input {
+      flex: 1;
+      padding: 12px 16px;
+      background: rgba(10,25,10,0.92);
+      border: 1px solid rgba(180,145,60,0.2);
+      border-radius: 50px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 13px;
+      color: var(--text-primary);
+      outline: none;
+      backdrop-filter: blur(10px);
+    }
+    .map-search-input::placeholder { color: rgba(180,145,60,0.28); }
+    .map-search-input:focus { border-color: rgba(180,145,60,0.45); }
+
+    /* Category chips on map */
+    .map-chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      margin-top: 10px;
+    }
+    .map-chips::-webkit-scrollbar { display: none; }
+
+    .map-chip {
+      flex-shrink: 0;
+      padding: 6px 14px;
+      background: rgba(10,25,10,0.88);
+      border: 1px solid rgba(180,145,60,0.2);
+      border-radius: 50px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: rgba(180,145,60,0.55);
+      cursor: pointer;
+      white-space: nowrap;
+      backdrop-filter: blur(8px);
+      transition: all 0.2s;
+    }
+    .map-chip.active,
+    .map-chip:hover {
+      background: rgba(180,145,60,0.15);
+      border-color: rgba(180,145,60,0.5);
+      color: var(--gold);
+    }
+
+    /* ---------- Location info card (bottom sheet) ---------- */
+    .info-sheet {
+      position: fixed;
+      bottom: 70px;
+      left: 0; right: 0;
+      z-index: 30;
+      padding: 0 16px;
+      transform: translateY(120%);
+      transition: transform 0.4s cubic-bezier(0.34,1.2,0.64,1);
+    }
+    .info-sheet.open { transform: translateY(0); }
+
+    .info-card {
+      background: rgba(10,24,10,0.97);
+      border: 1px solid rgba(180,145,60,0.22);
+      border-radius: 22px;
+      overflow: hidden;
+      backdrop-filter: blur(16px);
+    }
+
+    .info-img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .info-img-placeholder {
+      width: 100%;
+      height: 130px;
+      background: linear-gradient(135deg, rgba(180,145,60,0.08) 0%, rgba(26,74,26,0.4) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .info-body { padding: 16px 18px 18px; }
+
+    .info-cat {
+      font-size: 9px;
+      letter-spacing: 0.28em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .info-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .info-desc {
+      font-size: 12px;
+      color: rgba(180,145,60,0.5);
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .info-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: rgba(180,145,60,0.4);
+      margin-bottom: 14px;
+    }
+
+    .info-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-directions {
+      flex: 1;
+      padding: 12px;
+      background: linear-gradient(135deg, #c9a84c, #e8c96a, #b8943e);
+      border: none;
+      border-radius: 12px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: #0d2206;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    .btn-fav {
+      width: 46px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(180,145,60,0.22);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .btn-fav:hover { border-color: rgba(180,145,60,0.5); }
+    .btn-fav.saved { background: rgba(180,145,60,0.12); border-color: rgba(180,145,60,0.4); }
+
+    .close-sheet {
+      position: absolute;
+      top: 12px; right: 16px;
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.5);
+      border: none;
+      color: rgba(180,145,60,0.7);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+    }
+
+    /* ---------- Locate me button ---------- */
+    .locate-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 160px;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(10,25,10,0.92);
+      border: 1px solid rgba(180,145,60,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 20;
+      backdrop-filter: blur(10px);
+      transition: border-color 0.2s;
+    }
+    .locate-btn:hover { border-color: rgba(180,145,60,0.5); }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <!-- Top Controls -->
+  <div class="map-top">
+    <div class="map-search-row">
+      <a href="home.html" class="back-circle">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(180,145,60,0.7)" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </a>
+      <input class="map-search-input" id="mapSearch" type="text" placeholder="Search locations…" oninput="filterMapLocations()" />
+    </div>
+
+    <div class="map-chips">
+      <div class="map-chip active" onclick="filterMapCat('all', this)">All</div>
+      <div class="map-chip" onclick="filterMapCat('Masjid', this)">Masjids</div>
+      <div class="map-chip" onclick="filterMapCat('Experience', this)">Experiences</div>
+      <div class="map-chip" onclick="filterMapCat('Café', this)">Cafés</div>
+      <div class="map-chip" onclick="filterMapCat('Restaurant', this)">Restaurants</div>
+      <div class="map-chip" onclick="filterMapCat('Culture', this)">Culture</div>
+      <div class="map-chip" onclick="filterMapCat('Shopping', this)">Shopping</div>
+      <div class="map-chip" onclick="filterMapCat('Dessert', this)">Desserts</div>
+    </div>
+  </div>
+
+  <!-- Locate me -->
+  <div class="locate-btn" onclick="locateUser()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(180,145,60,0.7)" stroke-width="1.8">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+      <circle cx="12" cy="12" r="8" stroke-dasharray="2 3" opacity="0.4"/>
+    </svg>
+  </div>
+
+  <!-- Info Sheet -->
+  <div class="info-sheet" id="infoSheet">
+    <div class="info-card" style="position:relative;">
+      <button class="close-sheet" onclick="closeSheet()">✕</button>
+      <div id="sheetContent"></div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <a href="home.html" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="rgba(180,145,60,0.35)" stroke-width="1.5">
+        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+        <polyline points="9,22 9,12 15,12 15,22"/>
+      </svg>
+      <span class="nav-label">Home</span>
+    </a>
+    <a href="map.html" class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="rgba(180,145,60,0.9)" stroke-width="1.5">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+        <circle cx="12" cy="10" r="3"/>
+      </svg>
+      <span class="nav-label" style="color:var(--gold);">Map</span>
+    </a>
+    <a href="pass.html" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="rgba(180,145,60,0.35)" stroke-width="1.5">
+        <rect x="2" y="7" width="20" height="14" rx="2"/>
+        <path d="M16 7V5a2 2 0 00-4 0v2M12 12v4M10 14h4"/>
+      </svg>
+      <span class="nav-label">Pass</span>
+    </a>
+    <a href="profile.html" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="rgba(180,145,60,0.35)" stroke-width="1.5">
+        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+      <span class="nav-label">Profile</span>
+    </a>
+  </nav>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+
+  <script src="js/mapbox-token.js"></script>
+<script>
+    const MAPBOX_TOKEN = window.MAPBOX_TOKEN || ''; // set in js/mapbox-token.js (not in git)
+
+    let map, allLocations = [], markers = [], currentUser, userFavourites = [];
+    let activeCategory = 'all';
+
+    auth.onAuthStateChanged(async user => {
+      if (!user) { window.location.href = 'welcome.html'; return; }
+      currentUser = user;
+
+      if (!user.isAnonymous) {
+        const snap = await db.collection('users').doc(user.uid).get();
+        userFavourites = snap.data()?.favourites || [];
+      }
+
+      initMap();
+      loadLocations();
+    });
+
+    function initMap() {
+      mapboxgl.accessToken = MAPBOX_TOKEN;
+      map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/dark-v11',
+        center: [39.6142, 24.4686],
+        zoom: 13,
+        attributionControl: false
+      });
+
+      // Close sheet when tapping map
+      map.on('click', () => closeSheet());
+    }
+
+    async function loadLocations() {
+      const snap = await db.collection('locations').get();
+      allLocations = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderMarkers(allLocations);
+    }
+
+    function renderMarkers(locations) {
+      markers.forEach(m => m.remove());
+      markers = [];
+
+      locations.forEach(loc => {
+        if (!loc.coordinates) return;
+
+        const el = document.createElement('div');
+        el.style.cssText = `
+          width: 32px; height: 32px;
+          background: radial-gradient(circle, #e8c96a 0%, #c9a84c 60%, #8a6820 100%);
+          border-radius: 50% 50% 50% 0;
+          transform: rotate(-45deg);
+          border: 2px solid rgba(255,255,255,0.15);
+          cursor: pointer;
+          box-shadow: 0 2px 12px rgba(180,145,60,0.4);
+          transition: transform 0.2s;
+        `;
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openSheet(loc);
+        });
+
+        const marker = new mapboxgl.Marker({ element: el })
+          .setLngLat([loc.coordinates.lng, loc.coordinates.lat])
+          .addTo(map);
+
+        markers.push(marker);
+      });
+    }
+
+    function openSheet(loc) {
+      const isSaved = userFavourites.includes(loc.id);
+      const sheet = document.getElementById('sheetContent');
+
+      sheet.innerHTML = `
+        ${loc.imageURL
+          ? `<img class="info-img" src="${loc.imageURL}" alt="${loc.name}" />`
+          : `<div class="info-img-placeholder">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(180,145,60,0.3)" stroke-width="1">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+              </svg>
+            </div>`
+        }
+        <div class="info-body">
+          <div class="info-cat">${loc.category || 'Destination'}</div>
+          <div class="info-name">${loc.name}</div>
+          <div class="info-desc">${loc.description || ''}</div>
+          ${loc.address ? `
+            <div class="info-meta">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+              </svg>
+              ${loc.address}
+            </div>
+          ` : ''}
+          ${loc.halaOffer ? `
+            <div style="background:rgba(180,145,60,0.08); border:1px solid rgba(180,145,60,0.2); border-radius:10px; padding:10px 12px; margin-bottom:14px; font-size:11px; color:rgba(180,145,60,0.7);">
+              <span style="font-weight:700; color:var(--gold); letter-spacing:0.1em;">HALA PASS</span> · ${loc.halaOffer}
+            </div>
+          ` : ''}
+          <div class="info-actions">
+            <button class="btn-directions" onclick="openDirections(${loc.coordinates.lat}, ${loc.coordinates.lng})">
+              Get Directions
+            </button>
+            <button class="btn-fav ${isSaved ? 'saved' : ''}" id="favBtn" onclick="toggleFav('${loc.id}')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="${isSaved ? '#c9a84c' : 'none'}" stroke="${isSaved ? '#c9a84c' : 'rgba(180,145,60,0.6)'}" stroke-width="1.8">
+                <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('infoSheet').classList.add('open');
+
+      // Fly map to location
+      map.flyTo({ center: [loc.coordinates.lng, loc.coordinates.lat], zoom: 15, duration: 800, offset: [0, -120] });
+    }
+
+    function closeSheet() {
+      document.getElementById('infoSheet').classList.remove('open');
+    }
+
+    function openDirections(lat, lng) {
+      window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank');
+    }
+
+    async function toggleFav(locationId) {
+      if (!currentUser || currentUser.isAnonymous) {
+        window.location.href = 'signup.html';
+        return;
+      }
+      const added = await toggleFavourite(currentUser.uid, locationId);
+      if (added) {
+        userFavourites.push(locationId);
+      } else {
+        userFavourites = userFavourites.filter(id => id !== locationId);
+      }
+      // Refresh sheet heart icon
+      const btn = document.getElementById('favBtn');
+      if (btn) {
+        btn.classList.toggle('saved', added);
+        const svg = btn.querySelector('path');
+        if (svg) {
+          svg.setAttribute('fill', added ? '#c9a84c' : 'none');
+          svg.setAttribute('stroke', added ? '#c9a84c' : 'rgba(180,145,60,0.6)');
+        }
+      }
+    }
+
+    function locateUser() {
+      navigator.geolocation?.getCurrentPosition(pos => {
+        map.flyTo({ center: [pos.coords.longitude, pos.coords.latitude], zoom: 15, duration: 1000 });
+      });
+    }
+
+    function filterMapCat(cat, el) {
+      activeCategory = cat;
+      document.querySelectorAll('.map-chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      applyMapFilters();
+    }
+
+    function filterMapLocations() { applyMapFilters(); }
+
+    function applyMapFilters() {
+      const q = document.getElementById('mapSearch').value.trim().toLowerCase();
+      let filtered = allLocations;
+      if (activeCategory !== 'all') filtered = filtered.filter(l => l.category === activeCategory);
+      if (q) filtered = filtered.filter(l => l.name?.toLowerCase().includes(q) || l.category?.toLowerCase().includes(q));
+      renderMarkers(filtered);
+    }
+  </script>
+</body>
+</html>

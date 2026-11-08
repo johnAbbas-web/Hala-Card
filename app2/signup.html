@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#061506" />
+  <title>Hala — Create Account</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="manifest" href="manifest.json" />
+
+  <style>
+    .auth-page {
+      min-height: 100vh;
+      padding: 50px 28px 60px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: 32px;
+      animation: fadeUp 0.7s ease forwards;
+      opacity: 0;
+    }
+
+    .auth-form {
+      animation: fadeUp 0.7s 0.15s ease forwards;
+      opacity: 0;
+    }
+
+    .auth-footer {
+      text-align: center;
+      margin-top: 20px;
+      animation: fadeUp 0.7s 0.3s ease forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .terms-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin: 18px 0 22px;
+    }
+
+    .terms-row input[type="checkbox"] {
+      margin-top: 3px;
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    .terms-text {
+      font-size: 11px;
+      color: rgba(180,145,60,0.4);
+      line-height: 1.6;
+    }
+
+    .terms-link {
+      color: rgba(180,145,60,0.72);
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .switch-text {
+      font-size: 12px;
+      color: rgba(180,145,60,0.35);
+    }
+    .switch-link {
+      color: rgba(180,145,60,0.75);
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 16px;
+      font-size: 12px;
+      color: rgba(180,145,60,0.28);
+      text-decoration: none;
+    }
+
+    .password-strength {
+      height: 3px;
+      border-radius: 2px;
+      background: rgba(180,145,60,0.12);
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .strength-bar {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.3s, background 0.3s;
+      width: 0%;
+    }
+
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(6,21,6,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .loading-overlay.show { opacity: 1; pointer-events: all; }
+  </style>
+</head>
+<body>
+  <div class="hala-bg">
+    <div class="arabesque"></div>
+
+    <div class="auth-page">
+
+      <div class="auth-header">
+        <a href="welcome.html" style="display:inline-block; margin-bottom:28px;">
+          <img src="assets/logo.png" alt="Hala" style="width:52px; height:52px; object-fit:contain; opacity:0.85;" />
+        </a>
+        <div class="section-eyebrow">Join Hala</div>
+        <div class="section-title">Create Account</div>
+        <div class="gold-rule" style="margin-top:10px;"></div>
+      </div>
+
+      <div class="auth-form">
+
+        <div class="form-group">
+          <label class="form-label" for="fullName">Full name</label>
+          <input class="form-input" type="text" id="fullName" placeholder="Your full name" autocomplete="name" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Email address</label>
+          <input class="form-input" type="email" id="email" placeholder="your@email.com" autocomplete="email" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input class="form-input" type="password" id="password" placeholder="Min. 8 characters" autocomplete="new-password" oninput="checkStrength(this.value)" />
+          <div class="password-strength">
+            <div class="strength-bar" id="strengthBar"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="confirmPassword">Confirm password</label>
+          <input class="form-input" type="password" id="confirmPassword" placeholder="Repeat password" autocomplete="new-password" />
+        </div>
+
+        <div class="terms-row">
+          <input type="checkbox" id="terms" />
+          <label class="terms-text" for="terms">
+            I agree to the <span class="terms-link">Terms of Service</span> and <span class="terms-link">Privacy Policy</span>
+          </label>
+        </div>
+
+        <button class="btn-gold" onclick="signUp()">Create Account</button>
+
+      </div>
+
+      <div class="auth-footer">
+        <div class="switch-text">
+          Already have an account?
+          <span class="switch-link" onclick="window.location.href='login.html'">Sign in</span>
+        </div>
+        <a href="welcome.html" class="back-link">← Back</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Loading overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+
+  <script>
+    auth.onAuthStateChanged(user => {
+      if (user && !user.isAnonymous) window.location.href = 'home.html';
+    });
+
+    function setLoading(on) {
+      document.getElementById('loadingOverlay').classList.toggle('show', on);
+    }
+
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast' + (isError ? ' error' : '');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    function checkStrength(val) {
+      const bar = document.getElementById('strengthBar');
+      let score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+
+      const pct   = (score / 4) * 100;
+      const color = score <= 1 ? '#c0392b' : score === 2 ? '#e67e22' : score === 3 ? '#c9a84c' : '#27ae60';
+      bar.style.width = pct + '%';
+      bar.style.background = color;
+    }
+
+    async function signUp() {
+      const name     = document.getElementById('fullName').value.trim();
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirm  = document.getElementById('confirmPassword').value;
+      const agreed   = document.getElementById('terms').checked;
+
+      if (!name)              return showToast('Please enter your name.', true);
+      if (!email)             return showToast('Please enter your email.', true);
+      if (password.length < 8) return showToast('Password must be at least 8 characters.', true);
+      if (password !== confirm) return showToast('Passwords do not match.', true);
+      if (!agreed)            return showToast('Please accept the terms to continue.', true);
+
+      setLoading(true);
+      try {
+        const cred = await auth.createUserWithEmailAndPassword(email, password);
+
+        // Update display name
+        await cred.user.updateProfile({ displayName: name });
+
+        // Create Firestore user profile
+        await db.collection('users').doc(cred.user.uid).set({
+          uid:         cred.user.uid,
+          name:        name,
+          email:       email,
+          photoURL:    '',
+          favourites:  [],
+          halaPassActive: true,
+          createdAt:   firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        window.location.href = 'home.html';
+      } catch (err) {
+        setLoading(false);
+        const msgs = {
+          'auth/email-already-in-use': 'An account with this email already exists.',
+          'auth/invalid-email':        'Please enter a valid email address.',
+          'auth/weak-password':        'Password is too weak.'
+        };
+        showToast(msgs[err.code] || 'Sign-up failed. Please try again.', true);
+      }
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') signUp();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hala Card - Madinah Travel</title>
+    <meta name="theme-color" content="#0A2B1A">
+    <meta name="description" content="Your exclusive travel companion for Madinah">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- iOS Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Hala Card">
+    <link rel="apple-touch-icon" href="assets/logo.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/logo.png">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyByZV80oEciUbgO8euosI6qjtDkrdYZH1g&libraries=places"></script>
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="screen active">
+        <div class="splash-content">
+            <div class="logo-container">
+                <!-- YOUR LOGO HERE -->
+                <img src="assets/logo.png" alt="Hala Card Logo" class="app-logo">
+                
+            </div>
+            <div class="loading-indicator">
+                <div class="spinner"></div>
+                <p class="loading-text">Initializing...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login/Signup Screen -->
+    <div id="auth-screen" class="screen">
+        <div class="auth-background"></div>
+        <div class="auth-container">
+            <!-- Logo Header -->
+            <div class="auth-header">
+                <!-- YOUR LOGO HERE -->
+                <img src="assets/logo.png" alt="Hala Card Logo" class="auth-logo">
+                <h1 class="auth-title">Hala Card</h1>
+                <p class="auth-subtitle">Begin your journey</p>
+            </div>
+
+            <!-- Login Form -->
+            <div id="login-form" class="auth-form active">
+                <div class="form-group">
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" placeholder="Email address" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" placeholder="Password" required>
+                        <button type="button" class="toggle-password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary" id="login-btn">
+                    <span>Sign In</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                <p class="auth-switch">
+                    Don't have an account? <a href="#" id="show-signup">Sign up</a>
+                </p>
+            </div>
+
+            <!-- Signup Form -->
+            <div id="signup-form" class="auth-form">
+                <div class="form-group">
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="first-name" placeholder="First name" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="last-name" placeholder="Last name" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="signup-email" placeholder="Email address" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="signup-password" placeholder="Password" required>
+                        <button type="button" class="toggle-password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary" id="signup-btn">
+                    <span>Create Account</span>
+                    <i class="fas fa-user-plus"></i>
+                </button>
+                <p class="auth-switch">
+                    Already have an account? <a href="#" id="show-login">Sign in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Screen -->
+    <div id="app-screen" class="screen">
+        <!-- Header with Your Logo -->
+        <header class="app-header">
+            <div class="header-left">
+                <!-- YOUR LOGO HERE -->
+                <img src="assets/logo.png" alt="Hala Card" class="app-logo-small">
+               
+            </div>
+            <div class="header-right">
+                <button class="icon-btn notification-btn" id="notification-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="app-content">
+            <!-- Home Page -->
+            <div id="home-page" class="page active">
+                <!-- Single Hero Card -->
+                <div class="hero-section">
+                    <div class="hero-card">
+                        <div class="hero-overlay"></div>
+                        <div class="hero-content">
+                            <h2 id="welcome-title">Welcome Back</h2>
+                            <p class="hero-subtitle">Unlock exclusive experiences and offers</p>
+                            <div class="hero-stats">
+                                <div class="stat-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>15+ Places</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-star"></i>
+                                    <span>Premium Access</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>Discover Madinah</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <button class="action-card" data-action="explore">
+                        <div class="action-icon">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <h3>Explore Madinah</h3>
+                        <p>Discover sacred sites & attractions</p>
+                    </button>
+                    
+                    <button class="action-card" data-action="favorites">
+                        <div class="action-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h3>My Favorites</h3>
+                        <p>Saved places & experiences</p>
+                    </button>
+                    
+                    <button class="action-card" data-action="offers">
+                        <div class="action-icon">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                        <h3>Special Offers</h3>
+                        <p>Exclusive discounts</p>
+                    </button>
+                    
+                    <button class="action-card" data-action="guide">
+                        <div class="action-icon">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <h3>Travel Guide</h3>
+                        <p>Tips & recommendations</p>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Explore Page -->
+            <div id="explore-page" class="page">
+                <div class="map-header">
+                    <div class="search-container">
+                        <div class="search-input">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search places..." id="place-search">
+                            <div class="search-results" id="search-results"></div>
+                        </div>
+                        <button class="filter-btn" id="filter-toggle">
+                            <i class="fas fa-filter"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Filters Panel (RESTORED) -->
+                    <div class="filters-panel" id="filters-panel">
+                        <div class="filter-section">
+                            <h4>Categories</h4>
+                            <div class="filter-options">
+                                <button class="filter-option active" data-filter="all">
+                                    <i class="fas fa-th-large"></i> All
+                                </button>
+                                <button class="filter-option" data-filter="mosque">
+                                    <i class="fas fa-mosque"></i> Mosques
+                                </button>
+                                <button class="filter-option" data-filter="restaurant">
+                                    <i class="fas fa-utensils"></i> Restaurants
+                                </button>
+                                <button class="filter-option" data-filter="cafe">
+                                    <i class="fas fa-coffee"></i> Cafes
+                                </button>
+                                <button class="filter-option" data-filter="experience">
+                                    <i class="fas fa-hiking"></i> Experiences
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="filter-actions">
+                            <button class="btn-filter apply-filter" id="apply-filters">
+                                <i class="fas fa-check"></i> Apply Filters
+                            </button>
+                            <button class="btn-filter clear-filter" id="clear-filters">
+                                <i class="fas fa-times"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Map Container -->
+                <div class="map-container">
+                    <div id="map"></div>
+                    
+                    <!-- Location Info -->
+                    <div class="map-overlay">
+                        <div class="location-info" id="location-info">
+                            <i class="fas fa-location-dot"></i>
+                            <span>Loading your location...</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Map Controls -->
+                    <div class="map-controls">
+                        <button class="map-control" id="locate-me" title="Find my location">
+                            <i class="fas fa-location-crosshairs"></i>
+                        </button>
+                        <button class="map-control" id="zoom-in" title="Zoom in">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <button class="map-control" id="zoom-out" title="Zoom out">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Place Details Modal (RESTORED) -->
+            <div class="place-modal" id="place-modal">
+                <div class="place-modal-content" id="place-modal-content">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Card Page -->
+            <div id="card-page" class="page">
+                <div class="card-container">
+                    <div class="coming-soon-card">
+                        <div class="coming-soon-icon">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <h2>Hala Card</h2>
+                        <p class="coming-soon-text">Your digital card is coming soon</p>
+                        <p class="coming-soon-desc">We're preparing something special for you. Stay tuned for exciting features and exclusive benefits.</p>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 65%"></div>
+                            </div>
+                            <span class="progress-text">65% Complete</span>
+                        </div>
+                        <button class="btn-secondary notify-btn">
+                            <i class="fas fa-bell"></i> Notify Me
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Page -->
+            <div id="profile-page" class="page">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h2 id="profile-name">John Doe</h2>
+                        <p id="profile-email">john@example.com</p>
+                        <div class="profile-badge">
+                            <i class="fas fa-crown"></i>
+                            <span>Platinum Member</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="visited-count">0</h3>
+                            <p>Places Visited</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="favorites-count">0</h3>
+                            <p>Favorites</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-menu">
+                    <h3>Account Settings</h3>
+                    <div class="menu-items">
+                        <a href="#" class="menu-item">
+                            <i class="fas fa-user-edit"></i>
+                            <span>Edit Profile</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                        <a href="#" class="menu-item">
+                            <i class="fas fa-bell"></i>
+                            <span>Notifications</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                        <a href="#" class="menu-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Privacy & Security</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                        <a href="#" class="menu-item">
+                            <i class="fas fa-question-circle"></i>
+                            <span>Help & Support</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                        <button class="menu-item logout-btn" id="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Log Out</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-page="home">
+                <div class="nav-icon">
+                    <i class="fas fa-home"></i>
+                </div>
+                <span>Home</span>
+            </button>
+            <button class="nav-item" data-page="explore">
+                <div class="nav-icon">
+                    <i class="fas fa-map"></i>
+                </div>
+                <span>Explore</span>
+            </button>
+            <button class="nav-item" data-page="card">
+                <div class="nav-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <span>Card</span>
+            </button>
+            <button class="nav-item" data-page="profile">
+                <div class="nav-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span>Profile</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Notifications Modal -->
+    <div id="notifications-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Notifications</h3>
+                <button class="close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="notification-item">
+                    <div class="notification-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <div class="notification-content">
+                        <h4>Special Offer</h4>
+                        <p>Get 20% off at selected restaurants</p>
+                        <span class="notification-time">2 hours ago</span>
+                    </div>
+                </div>
+                <div class="notification-item">
+                    <div class="notification-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="notification-content">
+                        <h4>New Place Added</h4>
+                        <p>Al Marbad Farm is now available</p>
+                        <span class="notification-time">1 day ago</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Coming Soon Modal -->
+    <div id="coming-soon-modal" class="modal">
+        <div class="modal-content compact">
+            <div class="modal-icon">
+                <i class="fas fa-gem"></i>
+            </div>
+            <h3>Coming Soon</h3>
+            <p>This feature is currently in development. We're working hard to bring you the best experience.</p>
+            <button class="btn-primary modal-close">Got it</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>

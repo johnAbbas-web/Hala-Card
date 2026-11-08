@@ -1,0 +1,379 @@
+/* ============================================================
+   HALA PWA — Global Styles
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Tajawal:wght@300;400;500;700&display=swap');
+
+/* ---------- Reset & Base ---------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --gold:          #c9a84c;
+  --gold-light:    #e8c96a;
+  --gold-dim:      rgba(180,145,60,0.5);
+  --gold-faint:    rgba(180,145,60,0.18);
+  --green-deep:    #061506;
+  --green-mid:     #0d2e0d;
+  --green-light:   #1a4a1a;
+  --text-primary:  rgba(220,200,150,0.92);
+  --text-muted:    rgba(180,145,60,0.55);
+  --border:        rgba(180,145,60,0.2);
+  --border-hover:  rgba(180,145,60,0.45);
+  --input-bg:      rgba(255,255,255,0.04);
+  --radius-sm:     10px;
+  --radius-md:     14px;
+  --radius-lg:     20px;
+  --radius-xl:     28px;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: var(--green-deep);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Background ---------- */
+.hala-bg {
+  min-height: 100vh;
+  background: radial-gradient(ellipse at center, #1a4a1a 0%, #0d2e0d 40%, #061506 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.hala-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 20%, rgba(180,145,60,0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 100% 50% at 50% 100%, rgba(6,21,6,0.95) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.arabesque {
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  background-image:
+    repeating-linear-gradient(45deg,  rgba(180,145,60,0.4) 0px, transparent 1px, transparent 22px, rgba(180,145,60,0.4) 23px),
+    repeating-linear-gradient(-45deg, rgba(180,145,60,0.4) 0px, transparent 1px, transparent 22px, rgba(180,145,60,0.4) 23px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ---------- Logo ---------- */
+.logo-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+  z-index: 1;
+}
+
+.logo-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 18px rgba(180,145,60,0.35));
+}
+
+.logo-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 48px;
+  font-weight: 300;
+  letter-spacing: 0.18em;
+  color: var(--gold);
+  line-height: 1;
+}
+
+.logo-sub {
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.5em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* ---------- Buttons ---------- */
+.btn-gold {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #c9a84c 0%, #e8c96a 45%, #b8943e 100%);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: #0d2206;
+  cursor: pointer;
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.btn-gold:hover  { opacity: 0.92; }
+.btn-gold:active { transform: scale(0.98); }
+
+.btn-gold::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -80%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.28), transparent);
+  animation: shimmer 3.5s infinite;
+}
+
+@keyframes shimmer {
+  0%   { left: -80%; }
+  100% { left: 160%; }
+}
+
+.btn-ghost {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 15px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  color: var(--gold-dim);
+  cursor: pointer;
+  text-transform: uppercase;
+  text-decoration: none;
+  text-align: center;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btn-ghost:hover { border-color: var(--border-hover); color: var(--gold); }
+
+.btn-text {
+  background: none;
+  border: none;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 12px;
+  color: rgba(180,145,60,0.35);
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  transition: color 0.2s;
+  padding: 4px;
+}
+.btn-text:hover { color: var(--gold-dim); }
+
+/* ---------- Form Elements ---------- */
+.form-group { margin-bottom: 16px; }
+
+.form-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 13px 16px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  -webkit-appearance: none;
+}
+
+.form-input::placeholder { color: rgba(180,145,60,0.22); }
+.form-input:focus {
+  border-color: var(--border-hover);
+  background: rgba(255,255,255,0.06);
+}
+
+/* ---------- Divider ---------- */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+.divider-line { flex: 1; height: 1px; background: rgba(180,145,60,0.12); }
+.divider-text { font-size: 11px; color: rgba(180,145,60,0.32); letter-spacing: 0.1em; }
+
+/* ---------- Toast Notification ---------- */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: rgba(20,50,20,0.95);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 24px;
+  font-size: 13px;
+  color: var(--gold-dim);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  z-index: 9999;
+  transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.35s;
+  opacity: 0;
+  backdrop-filter: blur(12px);
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast.error { border-color: rgba(220,80,80,0.4); color: rgba(255,140,140,0.8); }
+
+/* ---------- Loading Spinner ---------- */
+.spinner {
+  width: 22px; height: 22px;
+  border: 2px solid rgba(180,145,60,0.2);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- Page Container ---------- */
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 28px;
+  position: relative;
+  z-index: 1;
+}
+
+.page-scroll {
+  min-height: 100vh;
+  padding: 60px 28px 40px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- Ornaments ---------- */
+.ornament {
+  position: absolute;
+  font-family: 'Cormorant Garamond', serif;
+  color: rgba(180,145,60,0.07);
+  pointer-events: none;
+  z-index: 0;
+  line-height: 1;
+  font-size: 140px;
+}
+.ornament-tl { top: -10px; left: -15px; }
+.ornament-br { bottom: -10px; right: -15px; transform: rotate(180deg); }
+
+/* ---------- Gold rule ---------- */
+.gold-rule {
+  width: 40px;
+  height: 1px;
+  background: var(--border);
+  margin: 0 auto;
+}
+
+/* ---------- Section header ---------- */
+.section-eyebrow {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.4em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 300;
+  color: rgba(210,180,100,0.9);
+  text-align: center;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+/* ---------- Bottom Nav ---------- */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0; right: 0;
+  height: 70px;
+  background: rgba(10,25,10,0.96);
+  border-top: 1px solid rgba(180,145,60,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 100;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 8px 16px;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.nav-item svg { width: 22px; height: 22px; }
+.nav-item .nav-label {
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(180,145,60,0.38);
+  transition: color 0.2s;
+}
+.nav-item.active .nav-label { color: var(--gold); }
+.nav-item.active svg path,
+.nav-item.active svg circle { stroke: var(--gold) !important; }
+
+/* ---------- Card ---------- */
+.hala-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(180,145,60,0.15);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ---------- Checkbox ---------- */
+input[type="checkbox"] { accent-color: var(--gold); }
+
+/* ---------- Scrollbar ---------- */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(180,145,60,0.25); border-radius: 2px; }
+
+/* ---------- Safe area for notch phones ---------- */
+.safe-top    { padding-top:    env(safe-area-inset-top,    24px); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom, 20px); }

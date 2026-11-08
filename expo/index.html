@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hala Card · Welcome to Madinah · Sierah Expo 2026</title>
+<meta name="description" content="An exclusive invitation for Sierah Expo attendees: reserve your Hala Card gift and discover Madinah.">
+<meta name="theme-color" content="#0B3D2A">
+<meta name="robots" content="noindex">
+<meta property="og:title" content="Hala Card · Welcome to Madinah">
+<meta property="og:description" content="An exclusive invitation for Sierah Expo 2026 attendees. The first 500 receive a free gift.">
+<meta property="og:image" content="https://halacard.co/assets1/section5bg.webp">
+<link rel="icon" type="image/png" href="img/hala-mark.png">
+<link rel="apple-touch-icon" href="../assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="img/madinah-dusk.webp">
+<link rel="stylesheet" href="css/expo.css?v=23">
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- ───────── 1 · Welcome ───────── -->
+  <section class="screen s-welcome" id="s-welcome" aria-labelledby="welcome-title">
+    <div class="welcome-photo" aria-hidden="true"><img src="img/madinah-dusk.webp" alt="" fetchpriority="high"></div>
+    <div class="welcome-top">
+      <a class="logo logo-light" href="./" aria-label="Hala Card"><img src="img/hala-mark.png" alt=""><span>Card</span></a>
+      <span class="expo-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5c3-1.5 7-1.5 10 1 3-2.5 7-2.5 10-1v14c-3-1.5-7-1.5-10 1-3-2.5-7-2.5-10-1z"/><path d="M12 6v14"/></svg>Sierah Expo 2026</span>
+    </div>
+
+    <div class="welcome-bottom">
+      <p class="gift-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v9H5v-9M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/></svg>First <span data-limit>500</span> receive a free gift</p>
+      <h1 class="w-title" id="welcome-title"><span class="w-1">Welcome to</span> <span class="w-2">Madinah</span></h1>
+      <p class="w-sub">Your journey starts here.</p>
+      <button class="btn btn-gold btn-xl" data-go="register">Unlock My Exclusive Access
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      <button class="link-btn link-light" id="have-pass" hidden data-go="pass">I already have my pass</button>
+      <p class="w-left" id="claim-label" hidden></p>
+      <p class="fineprint fp-light"><a href="terms.html">Offer terms</a> · <a href="privacy.html">Privacy</a></p>
+    </div>
+  </section>
+
+  <!-- ───────── 2 · Register ───────── -->
+  <section class="screen s-light" id="s-register" aria-labelledby="reg-title">
+    <header class="bar">
+      <button class="icon-btn" data-go="welcome" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <span class="logo logo-dark logo-sm"><img src="img/hala-mark.png" alt=""><span>Card</span></span>
+      <span class="bar-gap"></span>
+    </header>
+
+    <div class="page">
+      <div class="page-head">
+        <h1 class="h-xl" id="reg-title">Let's get you started</h1>
+        <p class="sub">Reserve your exclusive Hala Card gift.</p>
+      </div>
+
+      <form class="form" id="reg-form" novalidate>
+        <div class="form-alert" id="form-alert" role="alert" hidden></div>
+
+        <div class="field" data-field="firstName">
+          <label for="firstName">Full name</label>
+          <div class="input-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+            <input class="input" id="firstName" name="firstName" autocomplete="name" autocapitalize="words" maxlength="60" required placeholder="Your name" aria-describedby="err-firstName">
+          </div>
+          <p class="err" id="err-firstName" aria-live="polite"></p>
+        </div>
+
+        <div class="field" data-field="email">
+          <label for="email">Email address</label>
+          <div class="input-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+            <input class="input" id="email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" maxlength="254" required placeholder="you@example.com" aria-describedby="err-email">
+          </div>
+          <p class="err" id="err-email" aria-live="polite"></p>
+        </div>
+
+        <div class="field" data-field="country">
+          <label for="country">Country <small>(optional)</small></label>
+          <div class="input-wrap select-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+            <select class="input" id="country" name="country" autocomplete="country-name"><option value="">Select country</option></select>
+          </div>
+        </div>
+
+        <div class="hp" aria-hidden="true"><label>Website <input name="website" tabindex="-1" autocomplete="off"></label></div>
+
+        <label class="check" data-field="acceptTerms">
+          <input type="checkbox" name="acceptTerms" required aria-describedby="err-acceptTerms">
+          <span>I agree to the <a href="terms.html" target="_blank" rel="noopener">Terms &amp; Conditions</a> and <a href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.</span>
+        </label>
+        <p class="err" id="err-acceptTerms" aria-live="polite"></p>
+
+        <label class="check">
+          <input type="checkbox" name="marketing">
+          <span>I'd like to receive updates about Hala Card <small>(optional)</small>.</span>
+        </label>
+
+        <button class="btn btn-green" type="submit" id="reg-submit">Reserve My Gift
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <p class="fineprint">We'll email you a link to confirm your address.</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ───────── Check inbox ───────── -->
+  <section class="screen s-light" id="s-check" aria-labelledby="check-title">
+    <header class="bar">
+      <button class="icon-btn" data-go="register" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <span class="logo logo-dark logo-sm"><img src="img/hala-mark.png" alt=""><span>Card</span></span>
+      <span class="bar-gap"></span>
+    </header>
+    <div class="page center">
+      <div class="mail-art" aria-hidden="true">
+        <span class="ring r1"></span><span class="ring r2"></span>
+        <div class="mail-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></div>
+      </div>
+      <h1 class="h-xl" id="check-title">Check your inbox</h1>
+      <p class="sub" id="check-text"></p>
+      <ol class="steps-card" aria-label="How to confirm">
+        <li><span>1</span><p>Open the email from <b>Hala Card</b></p></li>
+        <li><span>2</span><p>Tap <b>Confirm my pass</b></p></li>
+        <li><span>3</span><p>Your <b>gift</b> is reserved</p></li>
+      </ol>
+      <p class="fineprint">Can't see it? Check spam or promotions. The link works for 48 hours.</p>
+      <div class="actions">
+        <button class="btn btn-green" data-go="discover">Explore Madinah meanwhile</button>
+        <button class="btn btn-outline" data-go="register">Use a different email</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── 3 · Confirmation / digital pass ───────── -->
+  <section class="screen s-light" id="s-pass" aria-labelledby="pass-title">
+    <header class="bar">
+      <span class="bar-gap"></span>
+      <span class="logo logo-dark logo-sm"><img src="img/hala-mark.png" alt=""><span>Card</span></span>
+      <button class="icon-btn" id="share-btn" aria-label="Share my pass">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v14"/></svg>
+      </button>
+    </header>
+
+    <div class="page center">
+      <p class="hello">Marhaba, <b data-name>Explorer</b></p>
+
+      <div class="gift-stage">
+        <div class="gift-card" id="pass" role="button" tabindex="0" aria-label="Explore Madinah" data-status="pending">
+          <div class="gc-sheen" aria-hidden="true"></div>
+          <div class="gc-top">
+            <span class="gc-label">Sierah Expo<br><small>Exclusive</small></span>
+            <span class="gc-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span>
+          </div>
+          <span class="gc-gift" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v9H5v-9M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/></svg></span>
+          <h1 class="gc-title" id="pass-title"><span>Your</span> Hala Card<br>Gift is Reserved!</h1>
+          <p class="gc-name" data-name>Explorer</p>
+          <div class="gc-skyline" data-skyline aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <div class="pass-meta" id="pass-meta"></div>
+      <div class="notice" id="pass-notice" hidden></div>
+
+      <button class="btn btn-gold" data-go="discover">Explore Madinah
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      <button class="btn btn-outline" id="resend-btn" hidden>Resend confirmation email</button>
+
+      <ol class="timeline" id="timeline" aria-label="What happens next">
+        <li data-step="confirm"><span class="t-dot" aria-hidden="true"></span><div><b>Confirm your email</b><small>Secures your place in the first <span data-limit>500</span></small></div></li>
+        <li data-step="launch"><span class="t-dot" aria-hidden="true"></span><div><b>Hala Card launches in December</b><small>We email your personal invitation</small></div></li>
+        <li data-step="claim"><span class="t-dot" aria-hidden="true"></span><div><b>Enjoy your gift &amp; partner offers</b><small>Up to 10 Madinah places with Hala Card benefits</small></div></li>
+      </ol>
+
+      <p class="fineprint">This is a personalised reservation preview, not an activated or redeemable pass. Subject to the <a href="terms.html">offer terms</a>.</p>
+      <p class="fineprint"><a href="#" id="manage-link">Manage my details</a> · <a href="privacy.html">Privacy</a></p>
+    </div>
+  </section>
+
+  <!-- ───────── 4 · Discover Madinah ───────── -->
+  <section class="screen s-light" id="s-discover" aria-labelledby="disc-title">
+    <header class="bar">
+      <button class="icon-btn" data-go="back" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <span class="logo logo-dark logo-sm"><img src="img/hala-mark.png" alt=""><span>Card</span></span>
+      <button class="icon-btn" id="mini-pass" data-go="pass" aria-label="My pass" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+      </button>
+      <button class="icon-btn icon-gold" id="mini-cta" data-go="register" aria-label="Reserve my gift" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v9H5v-9M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/></svg>
+      </button>
+    </header>
+
+    <div class="disc-head">
+      <div>
+        <h1 class="h-xl" id="disc-title">Discover Madinah</h1>
+        <p class="sub">Curated experiences, places and exclusive offers.</p>
+      </div>
+      <svg class="palm" viewBox="0 0 80 90" aria-hidden="true"><g fill="none" stroke="#C9962A" stroke-width="2.2" stroke-linecap="round"><path d="M42 88c-2-22 0-40 4-56"/><path d="M46 32c-8-10-22-12-34-6 10 0 20 2 28 10"/><path d="M46 32c4-12 16-20 30-18-10 4-18 10-24 20"/><path d="M46 32c-2-12-10-22-22-26 6 8 10 16 12 26"/><path d="M46 32c10-6 24-4 32 6-10-4-20-4-28 0"/><path d="M46 32c-12-2-24 6-28 16 8-6 18-10 26-10"/></g></svg>
+    </div>
+
+    <nav class="cats" id="chips" aria-label="Filter experiences"></nav>
+
+    <div class="sec-title"><h2>Featured Experiences</h2><span id="xp-count"></span></div>
+    <div class="cards" id="cards"></div>
+
+    <div class="disc-foot">
+      <div class="promo" id="disc-promo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v9H5v-9M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/></svg>
+        <div><b>Up to 10 places, one pass</b><small>Partner discounts are revealed when Hala Card launches.</small></div>
+      </div>
+      <p class="fineprint">Experiences shown are a preview and subject to partner confirmation.</p>
+      <p class="fineprint"><a href="terms.html">Offer terms</a> · <a href="privacy.html">Privacy</a> · <a href="mailto:info@halacard.co">Contact</a></p>
+    </div>
+  </section>
+</div>
+
+<!-- 5 · Experience detail -->
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+  <div class="sheet-backdrop" data-close></div>
+  <div class="sheet-panel" id="sheet-panel"></div>
+</div>
+
+<div class="sparkles" id="sparkles" aria-hidden="true"></div>
+
+<script src="js/skyline.js?v=2"></script>
+<script src="js/experiences.js?v=3"></script>
+<script src="js/expo.js?v=20"></script>
+</body>
+</html>
